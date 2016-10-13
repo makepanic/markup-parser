@@ -40,6 +40,7 @@ const expecations = [
   ['~~~~~a~~~~~', '<strike>~~~~a~~~~</strike>'],
   ['__a__', '<i>_a_</i>'],
   ['___a___', '<i>__a__</i>'],
+  ['a `@foo ||= bar` `foo = bar` a `|` `a|a` `a|` `|a` ` |a`', 'a <code>@foo ||= bar</code> <code>foo = bar</code> a <code>|</code> <code>a|a</code> <code>a|</code> <code>|a</code> <code> |a</code>'],
   [`
 > lolwut
 wasdf
