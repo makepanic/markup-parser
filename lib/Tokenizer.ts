@@ -1,21 +1,8 @@
 import assert from './assert';
-import TokenMatcher from "./token-matcher";
+import TokenMatcher from "./TokenMatcher";
+import Token from "./Token";
 
 type MatchRange<T extends number> = [number, number, TokenMatcher<T>];
-
-class Token<T extends number> {
-  readonly start: number;
-  readonly end: number;
-  readonly format: TokenMatcher<T>;
-  consumed: boolean = false;
-
-  constructor(start: number, end: number, format: TokenMatcher<T>) {
-    this.start = start;
-    this.end = end;
-    this.format = format;
-    this.consumed = false;
-  }
-}
 
 class Tokenizer<T extends number> {
   private matcher: Array<TokenMatcher<T>>;
@@ -94,5 +81,4 @@ class Tokenizer<T extends number> {
   }
 }
 
-export {Token, Tokenizer};
-
+export default Tokenizer;

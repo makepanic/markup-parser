@@ -2,6 +2,8 @@ import test from 'ava';
 import format from '../../example';
 
 const expecations = [
+  ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank">https://www.google.com/myAccountUpperCase/foo</a> test'],
+  ['test user@goOgle.com test', 'test <a href="mailto:user@goOgle.com" target="_blank">user@goOgle.com</a> test'],
   ['a \\*a* a *a* a*', 'a *a* a <strong>a</strong> a*'],
   [`
     > quote
@@ -40,6 +42,7 @@ const expecations = [
   ['~~~~~a~~~~~', '<strike>~~~~a~~~~</strike>'],
   ['__a__', '<i>_a_</i>'],
   ['___a___', '<i>__a__</i>'],
+  // ['``` const f = 2 *2* 3 ```', '<pre> const f = 2 *2* 3 </pre>'],
   ['a `@foo ||= bar` `foo = bar` a `|` `a|a` `a|` `|a` ` |a`', 'a <code>@foo ||= bar</code> <code>foo = bar</code> a <code>|</code> <code>a|a</code> <code>a|</code> <code>|a</code> <code> |a</code>'],
   [`
 > lolwut

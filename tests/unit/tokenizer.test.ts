@@ -1,6 +1,6 @@
-import {Tokenizer} from '../../lib/tokenizer';
 import test from 'ava';
-import Matcher from '../../lib/token-matcher';
+import Tokenizer from "../../lib/Tokenizer";
+import TokenMatcher from "../../lib/TokenMatcher";
 
 enum Type {
   EOL,
@@ -11,8 +11,8 @@ enum Type {
 
 test('tokenize', function (t) {
   const tokenizer = new Tokenizer<Type>()
-    .add(new Matcher(/(\n)/g, Type.Newline))
-    .add(new Matcher(/A/g, Type.A))
+    .add(new TokenMatcher(/(\n)/g, Type.Newline))
+    .add(new TokenMatcher(/A/g, Type.A))
     .terminateWith(Type.EOL)
     .fillWith(Type.Text);
 
@@ -22,8 +22,8 @@ test('tokenize', function (t) {
 
 test('tokenize empty string', function (t) {
   const tokenizer = new Tokenizer<Type>()
-    .add(new Matcher(/(\n)/g, Type.Newline))
-    .add(new Matcher(/A/g, Type.A))
+    .add(new TokenMatcher(/(\n)/g, Type.Newline))
+    .add(new TokenMatcher(/A/g, Type.A))
     .terminateWith(Type.EOL)
     .fillWith(Type.Text);
 
@@ -33,12 +33,12 @@ test('tokenize empty string', function (t) {
 
 test('uses constraint function', function (t) {
   const tokenizerA = new Tokenizer<Type>()
-    .add(new Matcher(/A/g, Type.A, (string, match) => string.substring(match.index, match.index + 1) === 'A'))
+    .add(new TokenMatcher(/A/g, Type.A, (string, match) => string.substring(match.index, match.index + 1) === 'A'))
     .fillWith(Type.Text)
     .terminateWith(Type.EOL);
 
   const tokenizerB = new Tokenizer<Type>()
-    .add(new Matcher(/A/g, Type.A, (string, match) => string.substring(match.index, match.index + 1) === 'B'))
+    .add(new TokenMatcher(/A/g, Type.A, (string, match) => string.substring(match.index, match.index + 1) === 'B'))
     .fillWith(Type.Text)
     .terminateWith(Type.EOL);
 
@@ -62,7 +62,7 @@ test('throws when trying to add two filler, terminators', function (t) {
 test('throws when trying to tokenize without filler', function (t) {
   t.throws(() => {
     new Tokenizer<Type>()
-      .add(new Matcher(/A/g, Type.A))
+      .add(new TokenMatcher(/A/g, Type.A))
       .tokenize('A')
   });
 });

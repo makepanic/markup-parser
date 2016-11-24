@@ -1,4 +1,4 @@
-import {Rule} from "./rule";
+import Rule from "./rule/Rule";
 
 class Node<T extends number> {
   readonly rule: Rule<T>;

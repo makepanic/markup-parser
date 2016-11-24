@@ -1,4 +1,4 @@
-import {Rule} from './rule';
+import Rule from "./rule/Rule";
 
 class Grammar<T extends number> {
   rules: Array<Rule<T>>;

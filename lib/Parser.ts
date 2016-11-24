@@ -1,7 +1,8 @@
-import Node from './node';
-import Grammar from "./grammar";
-import {Rule} from "./rule";
-import {Token} from "./tokenizer";
+import RuleProperty from "./RuleProperty";
+import Grammar from "./Grammar";
+import Node from "./Node";
+import Rule from "./rule/Rule";
+import Token from "./Token";
 
 interface PeekResult<T extends number> {
   idx: number,
@@ -61,7 +62,7 @@ class Parser<T extends number> {
         if (token.consumed) {
           continue;
         }
-        if (rule.blockForm) {
+        if (rule.properties & RuleProperty.Block) {
           const closing = this.peek(rule.close, tokens.slice(index + 1));
 
           if (closing === undefined) {

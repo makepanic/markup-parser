@@ -1,10 +1,10 @@
-import Parser from './lib/parse';
-import Grammar from './lib/grammar'
-import {Block, Constant, Text} from './lib/rule';
-
-import {Tokenizer} from './lib/tokenizer';
-import Matcher from './lib/token-matcher';
-
+import Tokenizer from "./lib/Tokenizer";
+import TokenMatcher from "./lib/TokenMatcher";
+import Grammar from "./lib/Grammar";
+import TextRule from "./lib/rule/TextRule";
+import BlockRule from "./lib/rule/BlockRule";
+import ConstantRule from "./lib/rule/ConstantRule";
+import Parser from "./lib/Parser";
 const ESCAPE_CHAR = '\\';
 const WHITEPSPACE_DELIMITER = /[\n .,+&?!/-]/;
 
@@ -43,43 +43,44 @@ let opens = or(whitespaceBefore, startOfString);
 let closes = or(whitespaceAfter, endOfString);
 
 const tokenizer = new Tokenizer<Type>()
-  .add(new Matcher(/(\n)/g, Type.Newline, notEscaped))
-  .add(new Matcher(/(>)/g, Type.Quote, notEscaped))
-  .add(new Matcher(/(\\)/g, Type.Escape, notEscaped))
-  .add(new Matcher(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/g, Type.Url))
-  .add(new Matcher(/\bwww\.[\S]+\b/g, Type.PseudoUrl))
-  .add(new Matcher(/\b(([a-zA-Z0-9_+\-.]+)@[0-9a-zA-Z_]+?(?:\.[a-zA-Z]{2,6}))+\b/g, Type.Email))
-  .add(new Matcher(/(\*)/g, Type.BoldOpen, and(notEscaped, opens)))
-  .add(new Matcher(/(\*)/g, Type.BoldClose, and(notEscaped, closes)))
-  .add(new Matcher(/(_)/g, Type.ItalicsOpen, and(notEscaped, opens)))
-  .add(new Matcher(/(_)/g, Type.ItalicsClose, and(notEscaped, closes)))
-  .add(new Matcher(/(~)/g, Type.StrikeOpen, and(notEscaped, opens)))
-  .add(new Matcher(/(~)/g, Type.StrikeClose, and(notEscaped, closes)))
-  .add(new Matcher(/(```)/g, Type.Preformatted, and(notEscaped, whitespaceBeforeOrAfter)))
-  .add(new Matcher(/(`)/g, Type.CodeOpen, and(notEscaped, opens)))
-  .add(new Matcher(/(`)/g, Type.CodeClose, and(notEscaped, closes)))
+  .add(new TokenMatcher(/(\n)/g, Type.Newline, notEscaped))
+  .add(new TokenMatcher(/(>)/g, Type.Quote, notEscaped))
+  .add(new TokenMatcher(/(\\)/g, Type.Escape, notEscaped))
+  .add(new TokenMatcher(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi, Type.Url))
+  .add(new TokenMatcher(/\bwww\.[\S]+\b/g, Type.PseudoUrl))
+  .add(new TokenMatcher(/\b(([a-zA-Z0-9_+\-.]+)@[0-9a-zA-Z_]+?(?:\.[a-zA-Z]{2,6}))+\b/gi, Type.Email))
+  .add(new TokenMatcher(/(\*)/g, Type.BoldOpen, and(notEscaped, opens)))
+  .add(new TokenMatcher(/(\*)/g, Type.BoldClose, and(notEscaped, closes)))
+  .add(new TokenMatcher(/(_)/g, Type.ItalicsOpen, and(notEscaped, opens)))
+  .add(new TokenMatcher(/(_)/g, Type.ItalicsClose, and(notEscaped, closes)))
+  .add(new TokenMatcher(/(~)/g, Type.StrikeOpen, and(notEscaped, opens)))
+  .add(new TokenMatcher(/(~)/g, Type.StrikeClose, and(notEscaped, closes)))
+  .add(new TokenMatcher(/(```)/g, Type.Preformatted, and(notEscaped, whitespaceBeforeOrAfter)))
+  .add(new TokenMatcher(/(`)/g, Type.CodeOpen, and(notEscaped, opens)))
+  .add(new TokenMatcher(/(`)/g, Type.CodeClose, and(notEscaped, closes)))
   .terminateWith(Type.Nul)
   .fillWith(Type.Text);
 
 const grammar = new Grammar<Type>()
-  .add(new Constant(Type.Newline, '<br>'))
-  .add(new Constant(Type.Escape, ''))
-  .add(new Text(Type.Text, (text) => text))
-  .add(new Text(Type.Url, (text) => `<a href="${text}" target="_blank">${text}</a>`))
-  .add(new Text(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank">${text}</a>`))
-  .add(new Text(Type.Email, (text) => `<a href="mailto:${text}" target="_blank">${text}</a>`))
-  .add(new Block(Type.Quote, Type.Newline, (children)=>`<blockquote>${children}</blockquote>`))
-  .add(new Block(Type.Quote, Type.Nul, (children)=>`<blockquote>${children}</blockquote>`))
-  .add(new Block(Type.BoldOpen, Type.BoldClose, (children)=>`<strong>${children}</strong>`))
-  .add(new Block(Type.ItalicsOpen, Type.ItalicsClose, (children)=>`<i>${children}</i>`))
-  .add(new Block(Type.StrikeOpen, Type.StrikeClose, (children)=>`<strike>${children}</strike>`))
-  .add(new Block(Type.Preformatted, Type.Preformatted, (children)=>`<pre>${children}</pre>`))
-  .add(new Block(Type.CodeOpen, Type.CodeClose, (children)=>`<code>${children}</code>`));
+  .add(new ConstantRule(Type.Newline, '<br>'))
+  .add(new ConstantRule(Type.Escape, ''))
+  .add(new TextRule(Type.Text, (text) => text))
+  .add(new TextRule(Type.Url, (text) => `<a href="${text}" target="_blank">${text}</a>`))
+  .add(new TextRule(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank">${text}</a>`))
+  .add(new TextRule(Type.Email, (text) => `<a href="mailto:${text}" target="_blank">${text}</a>`))
+  .add(new BlockRule(Type.Quote, Type.Newline, (children)=>`<blockquote>${children}</blockquote>`))
+  .add(new BlockRule(Type.Quote, Type.Nul, (children)=>`<blockquote>${children}</blockquote>`))
+  .add(new BlockRule(Type.BoldOpen, Type.BoldClose, (children)=>`<strong>${children}</strong>`))
+  .add(new BlockRule(Type.ItalicsOpen, Type.ItalicsClose, (children)=>`<i>${children}</i>`))
+  .add(new BlockRule(Type.StrikeOpen, Type.StrikeClose, (children)=>`<strike>${children}</strike>`))
+  .add(new BlockRule(Type.Preformatted, Type.Preformatted, (children)=>`<pre>${children}</pre>`))
+  .add(new BlockRule(Type.CodeOpen, Type.CodeClose, (children)=>`<code>${children}</code>`));
 
 const parser = new Parser(grammar)
-  .withFallbackRule(new Text(Type.Text, (text) => text));
+  .withFallbackRule(new TextRule(Type.Text, (text) => text));
 
 function render(text: string) {
+  console.log('rendering', text);
   const tokens = tokenizer.tokenize(text);
   const tree = parser.parse(tokens);
 
