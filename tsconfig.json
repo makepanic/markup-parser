@@ -1,6 +1,25 @@
 {
+  "include": [
+    "lib/**/*.ts",
+    "debug/**/*.ts",
+    "tests/**/*.ts",
+    "example.ts"
+  ],
+  "sourceMap": true,
   "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
     "module": "commonjs",
-    "target": "es2015"
+    "target": "es5",
+    "allowJs": true,
+    "lib": [
+      "DOM",
+      "es2016",
+      "es5",
+      "es2015.core",
+      "es2015.collection",
+      "es2016.array.include"
+    ]
   }
 }

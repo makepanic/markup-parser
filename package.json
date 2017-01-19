@@ -4,7 +4,10 @@
   "description": "A set of primitives for building string markup parsers",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && ava"
+    "test": "tsc && ava dist/tests/unit/example.test.js",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "start": "webpack-dev-server --open"
   },
   "repository": {
     "type": "git",
@@ -13,6 +16,12 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "ava": "^0.17.0"
+    "ava": "^0.21.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "source-map-loader": "^0.2.1",
+    "ts-loader": "^2.3.2",
+    "typescript": "^2.4.2",
+    "webpack": "^3.4.1",
+    "webpack-dev-server": "^2.6.1"
   }
 }

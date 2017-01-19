@@ -3,6 +3,7 @@ import Grammar from "./Grammar";
 import Node from "./Node";
 import Rule from "./rule/Rule";
 import Token from "./Token";
+import TokenKind from "./TokenKind";
 
 interface PeekResult<T extends number> {
   idx: number,
@@ -23,13 +24,13 @@ class Parser<T extends number> {
     return this;
   }
 
-  peek(type: T, tokens: Array<Token<T>>): PeekResult<T> | undefined {
+  peek(type: T, tokenKind: TokenKind, tokens: Array<Token<T>>): PeekResult<T> | undefined {
     let idx = -1;
     let token;
 
     for (let i = 0; i < tokens.length; i++) {
-      const {format} = tokens[i];
-      if (type === format.id) {
+      const {id, kind} = tokens[i];
+      if (type === id && (kind === tokenKind || kind & tokenKind)) {
         idx = i;
         token = tokens[i];
         break;
@@ -40,7 +41,9 @@ class Parser<T extends number> {
   }
 
   openRules(token: Token<T>): Array<Rule<T>> {
-    return this.grammar.ruleOpenLookup[+token.format.id] || [];
+    const rules = (this.grammar.ruleOpenLookup[+token.id] || [])
+      .filter(rule => (rule.openKind === token.kind || rule.openKind & token.kind));
+    return rules;
   }
 
   fallbackNodeForToken(token: Token<T>) {
@@ -62,8 +65,10 @@ class Parser<T extends number> {
         if (token.consumed) {
           continue;
         }
+
         if (rule.properties & RuleProperty.Block) {
-          const closing = this.peek(rule.close, tokens.slice(index + 1));
+          // block rule
+          const closing = this.peek(rule.close, rule.closesKind, tokens.slice(index + 1));
 
           if (closing === undefined) {
             if ((ruleIndex - 1 ) === rules.length) {
@@ -76,7 +81,9 @@ class Parser<T extends number> {
             token.consumed = true;
             closing.token.consumed = true;
             const node = new Node<T>(rule, token.start, closing.token.end);
+
             this.parse(tokens.slice(index + 1, index + 1 + closing.idx), node, level + 1);
+
             parent.appendChild(node);
           }
         } else {

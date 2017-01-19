@@ -2,12 +2,12 @@ import Rule from "./rule/Rule";
 
 class Node<T extends number> {
   readonly rule: Rule<T>;
-  readonly start: number;
-  readonly end: number;
+  start: number;
+  end: number;
   children: Array<Node<T>>;
   parentNode: Node<T>;
 
-  constructor(rule?, start?, end?) {
+  constructor(rule?: Rule<T>, start?: number, end?: number) {
     this.rule = rule;
     this.start = start;
     this.end = end;
@@ -22,6 +22,7 @@ class Node<T extends number> {
 
   expand(string: string): string {
     const tree = this;
+
     if (!tree.children.length) {
       if (tree.rule) {
         return tree.rule.display(string.substring(tree.start, tree.end));

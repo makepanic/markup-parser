@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <style>
+    body {
+      font-family: Iosevka, monospace;
+    }
+    div {
+      display: block;
+    }
+    .tokens{
+      display: block;
+      background: #dbe4ff;
+      border-bottom: 1px solid #bac8ff;
+    }
+    .tokens__error,
+    .tokens__success{
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      white-space: pre-line;
+    }
+    .tokens__error{
+      background: #c92a2a;
+      color: white;
+    }
+    .tokens__success{
+      background: #d3f9d8;
+      color: #2b8a3e;
+    }
+    .token{
+      display: inline-block;
+      vertical-align: middle;
+      background: #3b5bdb;
+      margin: 5px;
+      border: 2px solid #3b5bdb;
+      position: relative;
+    }
+
+    .token:before, .token:after{
+      position: absolute;
+      border: 28.5px solid transparent;
+    }
+
+    .token__head{
+      font-size: 12px;
+      font-weight: bold;
+      background: #5c7cfa;
+      color: white;
+      padding: 5px;
+    }
+    .token__text{
+      font-size: 14px;
+      text-align: center;
+      color: white;
+      padding: 5px;
+    }
+
+    /* opens */
+    .token--kind-1{
+      margin-left: 28.5px;
+    }
+    .token--kind-1:before {
+      content: '';
+      border-right-color: inherit;
+      left: -59px;
+      top: -2px;
+    }
+    /* closes */
+    .token--kind-2 {
+      margin-right: 28.5px;
+    }
+    .token--kind-2:before {
+      content: '';
+      border-left-color: inherit;
+      right: -59px;
+      top: -2px;
+    }
+    /* open + closes */
+    .token--kind-3{
+      margin-left: 28.5px;
+      margin-right: 28.5px;
+    }
+    .token--kind-3:before {
+      content: '';
+      border-right-color: inherit;
+      left: -59px;
+      top: -2px;
+    }
+    .token--kind-3:after {
+      content: '';
+      border-left-color: inherit;
+      right: -59px;
+      top: -2px;
+    }
+
+    .live__input{
+      display: block;
+      margin-bottom: 10px;
+    }
+    .live__output{
+      display: block;
+      margin-bottom: 10px;
+    }
+    .live__output code{
+      background-color: #e9ecef;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .live__output a{
+      background-color: #dbe4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .live__debug{
+      display: block;
+      margin-bottom: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+<script src="./example-markup-parser.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import test from 'ava';
 import format from '../../example';
 
-const expecations = [
+const expectations =[
   ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank">https://www.google.com/myAccountUpperCase/foo</a> test'],
   ['test user@goOgle.com test', 'test <a href="mailto:user@goOgle.com" target="_blank">user@goOgle.com</a> test'],
   ['a \\*a* a *a* a*', 'a *a* a <strong>a</strong> a*'],
@@ -42,12 +42,14 @@ const expecations = [
   ['~~~~~a~~~~~', '<strike>~~~~a~~~~</strike>'],
   ['__a__', '<i>_a_</i>'],
   ['___a___', '<i>__a__</i>'],
-  // ['``` const f = 2 *2* 3 ```', '<pre> const f = 2 *2* 3 </pre>'],
+  ['``` const f = 2 *2* 3 ```', '<pre> const f = 2 <strong>2</strong> 3 </pre>'],
   ['a `@foo ||= bar` `foo = bar` a `|` `a|a` `a|` `|a` ` |a`', 'a <code>@foo ||= bar</code> <code>foo = bar</code> a <code>|</code> <code>a|a</code> <code>a|</code> <code>|a</code> <code> |a</code>'],
   [`
 > lolwut
 wasdf
-`,'<br><blockquote> lolwut</blockquote>wasdf<br>'],
+`, '<br><blockquote> lolwut</blockquote>wasdf<br>'],
+  [`
+> lolwut`, '<br><blockquote> lolwut</blockquote>'],
   [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean varius auctor eros, ac congue enim lacinia egestas. Nam gravida sem velit, sit amet eleifend dolor venenatis at. Aenean ut pellentesque ex, sed egestas neque. Sed ut ultrices ex, et maximus nunc. Fusce sed metus massa. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vestibulum non lacinia nisi, ut facilisis nisl. Praesent posuere massa ac dui vehicula condimentum. Donec ornare urna vel mattis ullamcorper. Morbi ex massa, dapibus sed ullamcorper at, luctus id nibh. Donec lobortis nunc sed convallis facilisis. Mauris vel tempor ipsum. Aenean interdum ullamcorper sapien, nec sollicitudin dui congue a.
 
@@ -59,10 +61,12 @@ Morbi cursus ante condimentum accumsan tempus. Aenean dapibus tellus ac sapien p
 
 Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec arcu nec nibh rhoncus dignissim a vel sapien. In consequat diam ut eleifend pellentesque. Sed pharetra dolor nibh, sit amet venenatis magna auctor ut. Aenean quis lacus iaculis, mattis nunc nec, consectetur nunc. Proin feugiat purus quis ultricies imperdiet. Nam nec nisi felis. Aliquam a nulla rhoncus elit placerat maximus et non quam. Suspendisse mattis erat id dolor tempor posuere a in neque. Ut ultricies sapien non malesuada rhoncus. Proin sit amet turpis vitae sem blandit dapibus. Sed hendrerit, lorem tempor aliquet consequat, felis leo iaculis eros, nec tincidunt lectus augue vel dui.`,
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean varius auctor eros, ac congue enim lacinia egestas. Nam gravida sem velit, sit amet eleifend dolor venenatis at. Aenean ut pellentesque ex, sed egestas neque. Sed ut ultrices ex, et maximus nunc. Fusce sed metus massa. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vestibulum non lacinia nisi, ut facilisis nisl. Praesent posuere massa ac dui vehicula condimentum. Donec ornare urna vel mattis ullamcorper. Morbi ex massa, dapibus sed ullamcorper at, luctus id nibh. Donec lobortis nunc sed convallis facilisis. Mauris vel tempor ipsum. Aenean interdum ullamcorper sapien, nec sollicitudin dui congue a.<br><br>Mauris ac ex pulvinar augue commodo laoreet. Maecenas laoreet diam lorem, sed placerat mauris euismod id. Vestibulum sed vehicula mauris. Proin elit ipsum, accumsan ac sagittis vel, imperdiet eget risus. Praesent ornare maximus nisl at varius. Morbi mi erat, convallis ut augue a, iaculis facilisis massa. Duis ultrices nibh imperdiet turpis blandit ornare. Vivamus ut leo ac purus iaculis convallis sit amet a sem. Vivamus vestibulum, nulla non efficitur fringilla, nibh lorem interdum tellus, volutpat dapibus eros mi porta neque. Morbi ultrices ac turpis interdum elementum. Integer commodo justo id hendrerit convallis. Curabitur efficitur aliquam pellentesque. Sed sed ex sit amet nisi rutrum malesuada. Vestibulum eget leo risus.<br><br>Nulla eu pharetra ipsum. Nullam non mollis neque. Mauris eu elit ullamcorper, accumsan nulla sed, vulputate neque. Integer faucibus nibh vel aliquam condimentum. Pellentesque eget urna justo. Nulla consectetur lectus rhoncus odio tempor fermentum. Nam luctus, lacus sit amet pulvinar mollis, purus sapien maximus lorem, vestibulum iaculis quam odio sit amet justo. Nam mollis nisi in luctus porta. Curabitur et massa nec ligula cursus pulvinar. Quisque et velit vehicula, tincidunt sem at, rhoncus nunc. Suspendisse commodo erat vitae ante consequat efficitur. Praesent ullamcorper nulla a nunc vulputate elementum. Quisque dui leo, accumsan eget risus nec, imperdiet tincidunt lorem. In accumsan massa nec augue egestas, at consequat augue accumsan.<br><br>Morbi cursus ante condimentum accumsan tempus. Aenean dapibus tellus ac sapien porta, non mollis est laoreet. Sed maximus nisl eu mi sollicitudin ultrices. Donec aliquam lorem eu dolor convallis ullamcorper. Nullam eu laoreet felis, at blandit nisi. In purus nisl, tincidunt in vehicula in, ultrices quis massa. Nulla non euismod nibh. Suspendisse facilisis malesuada diam, sit amet finibus lacus feugiat vel. Aliquam iaculis et ex in viverra. Etiam tincidunt, enim non ullamcorper fringilla, enim est varius justo, non viverra metus dolor cursus justo. Sed sit amet metus id neque efficitur convallis. Etiam ultrices, nulla vel pulvinar porta, augue mi pellentesque sem, id faucibus enim risus eu augue. Vivamus risus justo, tristique in rutrum sollicitudin, aliquam et metus. Nulla augue quam, interdum quis nulla ut, finibus ullamcorper turpis.<br><br>Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec arcu nec nibh rhoncus dignissim a vel sapien. In consequat diam ut eleifend pellentesque. Sed pharetra dolor nibh, sit amet venenatis magna auctor ut. Aenean quis lacus iaculis, mattis nunc nec, consectetur nunc. Proin feugiat purus quis ultricies imperdiet. Nam nec nisi felis. Aliquam a nulla rhoncus elit placerat maximus et non quam. Suspendisse mattis erat id dolor tempor posuere a in neque. Ut ultricies sapien non malesuada rhoncus. Proin sit amet turpis vitae sem blandit dapibus. Sed hendrerit, lorem tempor aliquet consequat, felis leo iaculis eros, nec tincidunt lectus augue vel dui.`
-  ]
+  ],
+  ['foo *bar _baz_* foo', 'foo <strong>bar <i>baz</i></strong> foo'],
+  ['~test from phone~_1 w rt,_ *yay* €*', '<strike>test from phone</strike><i>1 w rt,</i> <strong>yay</strong> €*']
 ];
 
-expecations.forEach(([input, expected]) => {
+expectations.forEach(([input, expected]) => {
   test(input, t => {
     t.is(format(input), expected);
   });
