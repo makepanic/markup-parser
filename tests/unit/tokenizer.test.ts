@@ -21,6 +21,13 @@ test('tokenize', function (t) {
   t.deepEqual(tokens.map(token => token.id), [Type.Text, Type.A, Type.Text, Type.Newline, Type.Text, Type.EOL]);
 });
 
+test('throws trying to tokenize without filler', function (t) {
+  t.throws(() => {
+    new Tokenizer<Type>()
+      .tokenize('o hai');
+  })
+});
+
 test('tokenize empty string', function (t) {
   const tokenizer = new Tokenizer<Type>()
     .add(new TokenMatcher(/(\n)/g, Type.Newline))

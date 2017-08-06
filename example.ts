@@ -108,8 +108,8 @@ const grammar = new Grammar<Type>()
   .add(new TextRule(Type.Url, (text) => `<a href="${text}" target="_blank">${text}</a>`))
   .add(new TextRule(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank">${text}</a>`))
   .add(new TextRule(Type.Email, (text) => `<a href="mailto:${text}" target="_blank">${text}</a>`))
-  .add(new BlockRule(Type.Quote, Type.Newline, (children) => `<blockquote>${children}</blockquote>`, TokenKind.Default, TokenKind.Default))
-  .add(new BlockRule(Type.Quote, Type.Nul, (children) => `<blockquote>${children}</blockquote>`, TokenKind.Default, TokenKind.Default))
+  .add(new BlockRule(Type.Quote, Type.Newline, (children) => `<blockquote>${children}</blockquote>`))
+  .add(new BlockRule(Type.Quote, Type.Nul, (children) => `<blockquote>${children}</blockquote>`))
   .add(new BlockRule(Type.Bold, Type.Bold, (children) => `<strong>${children}</strong>`, TokenKind.Opens, TokenKind.Closes))
   .add(new BlockRule(Type.Italics, Type.Italics, (children) => `<i>${children}</i>`, TokenKind.Opens, TokenKind.Closes))
   .add(new BlockRule(Type.Strike, Type.Strike, (children) => {
@@ -117,7 +117,7 @@ const grammar = new Grammar<Type>()
   }, TokenKind.Opens, TokenKind.Closes))
   .add(new BlockRule(Type.Preformatted, Type.Preformatted, (children) => {
     return `<pre>${children}</pre>`
-  }, TokenKind.Default, TokenKind.Default))
+  }))
   .add(new BlockRule(Type.Code, Type.Code, (children) => `<code>${children}</code>`, TokenKind.Opens, TokenKind.Closes));
 
 const parser = new Parser(grammar)

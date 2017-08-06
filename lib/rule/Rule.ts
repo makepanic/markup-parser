@@ -21,10 +21,6 @@ class Rule<T extends number> {
     this.openKind = openKind;
     this.closesKind = closesKind;
   }
-
-  toString() {
-    return `${(this.properties & RuleProperty.Block) ? 'Block' : 'Tag'}: ${this.open} ${this.close}`;
-  }
 }
 
 export default Rule;
