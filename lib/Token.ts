@@ -12,7 +12,6 @@ class Token<T extends number> {
     this.start = start;
     this.end = end;
     this.id = id;
-    this.consumed = false;
     this.kind = kind;
   }
 }

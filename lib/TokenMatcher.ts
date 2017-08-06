@@ -16,8 +16,6 @@ class TokenMatcher<T extends number> {
 
     this.id = id;
     this.constraints = constraints;
-
-    return this;
   }
 }
 

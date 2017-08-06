@@ -12,11 +12,10 @@ interface PeekResult<T extends number> {
 
 class Parser<T extends number> {
   private grammar: Grammar<T>;
-  private fallbackRule: Rule<T>;
+  private fallbackRule: Rule<T> = undefined;
 
   constructor(grammar: Grammar<T>) {
     this.grammar = grammar;
-    this.fallbackRule = undefined;
   }
 
   withFallbackRule(rule: Rule<T>) {

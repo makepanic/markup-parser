@@ -32,6 +32,8 @@ const expectations =[
   ['a https://xkcd.com/about/ a', 'a <a href="https://xkcd.com/about/" target="_blank">https://xkcd.com/about/</a> a'],
   ['a www.xkcd.com a', 'a <a href="http://www.xkcd.com" target="_blank">www.xkcd.com</a> a'],
   ['a www.xkcd.com/about a', 'a <a href="http://www.xkcd.com/about" target="_blank">www.xkcd.com/about</a> a'],
+  ['a xkcd.com a', 'a <a href="http://xkcd.com" target="_blank">xkcd.com</a> a'],
+  ['a xkcd.com/about a', 'a <a href="http://xkcd.com/about" target="_blank">xkcd.com/about</a> a'],
   ['a test_foo+spamblock@mail.de a', 'a <a href="mailto:test_foo+spamblock@mail.de" target="_blank">test_foo+spamblock@mail.de</a> a'],
   ['a *a _a a_ _a ~a* a', 'a <strong>a <i>a a</i> _a ~a</strong> a'],
   ['wasd \\*wasd\\*, \\_wasd\\_\nwasd \\*wasd\\*!wasd\nwasd ,\\*wasd\\* wasd', 'wasd *wasd*, _wasd_<br>wasd *wasd*!wasd<br>wasd ,*wasd* wasd'],

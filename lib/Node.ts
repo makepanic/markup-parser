@@ -2,17 +2,15 @@ import Rule from "./rule/Rule";
 
 class Node<T extends number> {
   readonly rule: Rule<T>;
-  start: number;
-  end: number;
-  children: Array<Node<T>>;
-  parentNode: Node<T>;
+  readonly start: number;
+  readonly end: number;
+  readonly children: Array<Node<T>> = [];
+  parentNode: Node<T> = undefined;
 
   constructor(rule?: Rule<T>, start?: number, end?: number) {
     this.rule = rule;
     this.start = start;
     this.end = end;
-    this.children = [];
-    this.parentNode = undefined;
   }
 
   appendChild(node: Node<T>) {

@@ -1,13 +1,8 @@
 import Rule from "./rule/Rule";
 
 class Grammar<T extends number> {
-  rules: Array<Rule<T>>;
-  ruleOpenLookup: {[key: number]: Array<Rule<T>>} = {};
-
-  constructor() {
-    this.rules = [];
-    this.ruleOpenLookup = {};
-  }
+  readonly rules: Array<Rule<T>> = [];
+  readonly ruleOpenLookup: {[key: number]: Array<Rule<T>>} = {};
 
   add(rule: Rule<T>) {
     this.rules.push(rule);

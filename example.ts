@@ -55,7 +55,7 @@ let otherTokenBefore = (string: string, start: number, end: number, index: numbe
   }
 };
 
-let otherTokenAfter = (string: string, start: number, end: number, index: number, tokens: Array<any>) => {
+let otherTokenAfter = (string: string, start: number, end: number, index: number, tokens: Array<[number, number, TokenMatcher<number>]>) => {
   if ((index + 1) < tokens.length) {
     const [tStart, , nextMatcher] = tokens[index + 1];
     const [, , currentMatcher] = tokens[index];
@@ -75,8 +75,9 @@ const tokenizer = new Tokenizer<Type>()
   .add(new TokenMatcher(/(>)/g, Type.Quote))
   .add(new TokenMatcher(/(\\)/g, Type.Escape))
   .add(new TokenMatcher(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi, Type.Url))
-  .add(new TokenMatcher(/\bwww\.[\S]+\b/g, Type.PseudoUrl))
-  .add(new TokenMatcher(/\b(([a-zA-Z0-9_+\-.]+)@[0-9a-zA-Z_]+?(?:\.[a-zA-Z]{2,6}))+\b/gi, Type.Email))
+  .add(new TokenMatcher(/\bwww\.\S+\b/gi, Type.PseudoUrl))
+  .add(new TokenMatcher(/\b(([\w+\-.]+)@\w+?(?:\.[a-zA-Z]{2,6}))+\b/gi, Type.Email))
+  .add(new TokenMatcher(/\b\S+\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)\S*\b/gi, Type.PseudoUrl))
   .add(new TokenMatcher(/(\*)/g, Type.Bold, [
     [or(opens, otherTokenBefore), TokenKind.Opens],
     [or(closes, otherTokenAfter), TokenKind.Closes]

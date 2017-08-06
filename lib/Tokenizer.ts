@@ -6,32 +6,6 @@ import TokenKind from "./TokenKind";
 declare type MatchRange<T extends number> = [number, number, TokenMatcher<T>];
 type TokenRange<T> = [number, number, T, TokenKind];
 
-/*
-
-Idea:
-foo *__*bar****
-
-->
-
-[
-  string
-  open
-  open
-  open
-  open
-  string
-  close
-  close
-  close
-  close
-]
-
-TODO:
-
-token with > 1 constraint should be tokenized as in ether
-
- */
-
 class Tokenizer<T extends number> {
   private matcher: Array<TokenMatcher<T>>;
   private filler: T;
@@ -101,23 +75,21 @@ class Tokenizer<T extends number> {
 
     let lastEnd = 0;
 
-    const sorted = tokens
-      .sort(([startA], [startB]) => startA - startB);
+    tokens
+      .sort(([startA], [startB]) => startA - startB)
+      .map(([start, end, matcher], index, tokens) => {
+        // find matching constraint
+        const matchingConstraints = matcher.constraints
+          .filter(([constraint]) => constraint(str, start, end, index, tokens));
 
-    // TODO: reduce iterations
-    sorted.map(([start, end, matcher], index, tokens) => {
-      // find matching constraint
-      const matchingConstraints = matcher.constraints
-        .filter(([constraint]) => constraint(str, start, end, index, tokens));
-
-      if (matchingConstraints.length) {
-        let mergedKinds = matchingConstraints.reduce((all, [, kind]) => {
-          return all | kind;
-        }, TokenKind.Default);
-        // [n, m, Bold, Closes]
-        return [start, end, matcher.id, mergedKinds];
-      }
-    })
+        if (matchingConstraints.length) {
+          let mergedKinds = matchingConstraints.reduce((all, [, kind]) => {
+            return all | kind;
+          }, TokenKind.Default);
+          // [n, m, Bold, Closes]
+          return [start, end, matcher.id, mergedKinds];
+        }
+      })
       .filter(t => t !== undefined)
       .forEach((token: TokenRange<T>) => {
         const [start, end] = token;
@@ -125,6 +97,7 @@ class Tokenizer<T extends number> {
         tokensWithText.push(token);
         lastEnd = end;
       });
+
     tokensWithText.push([lastEnd, str.length, this.filler, TokenKind.Default]);
 
     const allTokens = tokensWithText
