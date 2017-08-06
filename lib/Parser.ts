@@ -5,7 +5,7 @@ import Rule from "./rule/Rule";
 import Token from "./Token";
 import TokenKind from "./TokenKind";
 
-interface PeekResult<T extends number> {
+export interface PeekResult<T extends number> {
   idx: number,
   token: Token<T>
 }

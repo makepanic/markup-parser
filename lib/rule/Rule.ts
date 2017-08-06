@@ -1,7 +1,7 @@
 import RuleProperty from "../RuleProperty";
 import TokenKind from "../TokenKind";
 
-interface DisplayFunction {
+export interface DisplayFunction {
   (string: string): string;
 }
 

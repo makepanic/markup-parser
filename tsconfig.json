@@ -7,12 +7,13 @@
   ],
   "sourceMap": true,
   "compilerOptions": {
+    "pretty": true,
     "outDir": "./dist/",
     "sourceMap": true,
+    "declaration": true,
     "noImplicitAny": true,
     "module": "commonjs",
     "target": "es5",
-    "allowJs": true,
     "lib": [
       "DOM",
       "es2016",

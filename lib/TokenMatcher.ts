@@ -1,10 +1,10 @@
 import TokenKind from "./TokenKind";
 const returnTrue = () => true;
 
-interface ConstraintFunction {
+export interface ConstraintFunction {
   (string: string, start: number, end: number, index?: number, tokens?: Array<any>): boolean;
 }
-type KindConstraint = [ConstraintFunction, TokenKind];
+export type KindConstraint = [ConstraintFunction, TokenKind];
 
 class TokenMatcher<T extends number> {
   readonly regex: RegExp;
