@@ -71,6 +71,7 @@ class Parser<T extends number> {
 
           if (closing === undefined) {
             if ((ruleIndex - 1 ) === rules.length) {
+              // TODO: check if this can be reached with terminator
               // no closing rule, create text node
               token.consumed = true;
               parent.appendChild(this.fallbackNodeForToken(token));
