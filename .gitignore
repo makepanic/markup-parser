@@ -90,4 +90,5 @@ fabric.properties
 *.js.map
 
 dist
+docs
 !webpack.config.js

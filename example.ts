@@ -6,9 +6,15 @@ import BlockRule from "./lib/rule/BlockRule";
 import ConstantRule from "./lib/rule/ConstantRule";
 import Parser from "./lib/Parser";
 import TokenKind from "./lib/TokenKind";
-
-const ESCAPE_CHAR = '\\';
-const WHITEPSPACE_DELIMITER = /[\n .,+&?!/-]/;
+import {
+  and,
+  closes,
+  opens,
+  or,
+  otherTokenAfter,
+  otherTokenBefore,
+  whitespaceBeforeOrAfter
+} from "./lib/utils/Conditions";
 
 enum Type {
   Nul,
@@ -26,49 +32,6 @@ enum Type {
   Strike,
   Code,
 }
-
-type condition = (str: string, start: number, end?: number) => boolean;
-
-let and = (...fns: any[]) => (...args: any[]) => fns.every(fn => fn(...args));
-let or = (...fns: any[]) => (...args: any[]) => fns.some(fn => fn(...args));
-
-let startOfString: condition = (str: string, start: number) => str.substring(start - 1, start) === '';
-let endOfString: condition = (str: string, start: number, end: number) => str.substring(end, end + 1) === '';
-let whitespaceBefore: condition = (str: string, start: number) => WHITEPSPACE_DELIMITER.test(str.substring(start - 1, start));
-let whitespaceAfter: condition = (str: string, start: number, end: number) => WHITEPSPACE_DELIMITER.test(str.substring(end, end + 1));
-let whitespaceBeforeOrAfter: condition = or(whitespaceBefore, whitespaceAfter, startOfString, endOfString);
-
-let opens = or(whitespaceBefore, startOfString);
-let closes = or(whitespaceAfter, endOfString);
-
-let otherTokenBefore = (string: string, start: number, end: number, index: number, tokens: Array<[number, number, TokenMatcher<number>]>) => {
-  if (index - 1 >= 0) {
-    const [, tEnd, prevMatcher] = tokens[index - 1];
-    const [, , currentMatcher] = tokens[index];
-
-    if (prevMatcher.id !== currentMatcher.id) {
-      return start === tEnd;
-    }
-    return false;
-  } else {
-    return false;
-  }
-};
-
-let otherTokenAfter = (string: string, start: number, end: number, index: number, tokens: Array<[number, number, TokenMatcher<number>]>) => {
-  if ((index + 1) < tokens.length) {
-    const [tStart, , nextMatcher] = tokens[index + 1];
-    const [, , currentMatcher] = tokens[index];
-
-    if (nextMatcher.id !== currentMatcher.id) {
-      return end === tStart;
-    } else {
-      return false;
-    }
-  } else {
-    return false;
-  }
-};
 
 const tokenizer = new Tokenizer<Type>()
   .add(new TokenMatcher(/(\n)/g, Type.Newline))
@@ -97,7 +60,6 @@ const tokenizer = new Tokenizer<Type>()
     [or(opens, otherTokenBefore), TokenKind.Opens],
     [or(closes, otherTokenAfter), TokenKind.Closes]
   ]))
-  .escapeWith(ESCAPE_CHAR)
   .terminateWith(Type.Nul)
   .fillWith(Type.Text);
 

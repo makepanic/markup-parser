@@ -9,7 +9,7 @@ type TokenRange<T> = [number, number, T, TokenKind];
 class Tokenizer<T extends number> {
   private matcher: Array<TokenMatcher<T>>;
   private filler: T;
-  private escaper: string;
+  private escaper: string = '\\';
   private terminator: T;
 
   constructor() {
@@ -24,25 +24,24 @@ class Tokenizer<T extends number> {
   }
 
   fillWith(type: T) {
-    assert('tokenizer can only have one filler', this.filler === undefined);
     this.filler = type;
     return this;
   }
 
   escapeWith(escaper: string) {
-    assert('tokenizer can only have one escaper', this.escaper === undefined);
     this.escaper = escaper;
     return this;
   }
 
   terminateWith(type: T) {
-    assert('tokenizer can only have one EOL', this.terminator === undefined);
     this.terminator = type;
     return this;
   }
 
   tokenize(str: string): Array<Token<T>> {
     assert('tokenizer needs a filler before tokenizing a string', this.filler !== undefined);
+    assert('tokenizer needs a escape string.', this.escaper !== undefined);
+    assert('tokenizer needs a terminator.', this.terminator !== undefined);
 
     let tokens: Array<MatchRange<T>> = [];
     let splitString = str;

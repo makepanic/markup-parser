@@ -1,6 +1,6 @@
 enum RuleProperty {
-  None = 0,
-  Block = 1 << 0
+  None = 0b000,
+  Block = 0b001
 }
 
 export default RuleProperty;

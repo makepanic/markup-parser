@@ -21,13 +21,6 @@ test('tokenize', function (t) {
   t.deepEqual(tokens.map(token => token.id), [Type.Text, Type.A, Type.Text, Type.Newline, Type.Text, Type.EOL]);
 });
 
-test('throws trying to tokenize without filler', function (t) {
-  t.throws(() => {
-    new Tokenizer<Type>()
-      .tokenize('o hai');
-  })
-});
-
 test('tokenize empty string', function (t) {
   const tokenizer = new Tokenizer<Type>()
     .add(new TokenMatcher(/(\n)/g, Type.Newline))
@@ -58,16 +51,16 @@ test('uses constraint function', function (t) {
   t.deepEqual(tokenizerB.tokenize('A').map(token => token.id), [Type.Text, Type.EOL])
 });
 
-test('throws when trying to add two filler, terminators', function (t) {
+test('throws when trying to tokenize without required options set', function (t) {
   t.throws(() => {
     new Tokenizer<Type>()
-      .terminateWith(Type.EOL)
-      .terminateWith(Type.A)
+      .terminateWith(undefined)
+      .tokenize('o hai')
   });
   t.throws(() => {
     new Tokenizer<Type>()
-      .fillWith(Type.EOL)
-      .fillWith(Type.A)
+      .fillWith(undefined)
+      .tokenize('o hai');
   });
 });
 

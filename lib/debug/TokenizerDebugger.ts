@@ -1,5 +1,5 @@
-import Token from "../lib/Token";
-import TokenKind from "../lib/TokenKind";
+import Token from "../Token";
+import TokenKind from "../TokenKind";
 
 class TokenizerDebugger<T extends number> {
   toHTMLElement(text: string, tokens: Array<Token<T>>) {

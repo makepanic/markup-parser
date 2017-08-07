@@ -9,3 +9,11 @@ transform it into an html string.
 TODO: 
 - docs
 - allow Rules to guard child rules from being parsed (i.e. code block shouldn't parse its content)
+
+## Architecture
+
+- String is processed in three steps:
+
+1. text -> Tokenizer = token list
+2. token list -> parser = tree
+3. text -> tree = processed text
