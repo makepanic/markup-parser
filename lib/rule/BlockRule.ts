@@ -1,6 +1,6 @@
-import RuleProperty from "../RuleProperty";
+import RuleProperty from "./RuleProperty";
 import Rule from "./Rule";
-import TokenKind from "../TokenKind";
+import TokenKind from "../token/TokenKind";
 
 class BlockRule<T extends number> extends Rule<T> {
   constructor(open: T, close: T, display: (text: string) => string, kindOpen = TokenKind.Default, kindClosed = TokenKind.Default) {

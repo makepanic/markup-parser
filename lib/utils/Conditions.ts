@@ -1,4 +1,4 @@
-import TokenMatcher from "../TokenMatcher";
+import TokenMatcher from "../token/TokenMatcher";
 
 const WHITEPSPACE_DELIMITER = /[\n .,+&?!/-]/;
 

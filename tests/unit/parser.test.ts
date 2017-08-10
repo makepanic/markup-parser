@@ -4,7 +4,7 @@ import Grammar from "../../lib/Grammar";
 import TextRule from "../../lib/rule/TextRule";
 import Tokenizer from "../../lib/Tokenizer";
 import BlockRule from "../../lib/rule/BlockRule";
-import TokenMatcher from "../../lib/TokenMatcher";
+import TokenMatcher from "../../lib/token/TokenMatcher";
 
 enum Type {
   Nul,
@@ -12,11 +12,8 @@ enum Type {
   Block,
 }
 
-const tokenizer = new Tokenizer<Type>()
-  .escapeWith('\\')
-  .add(new TokenMatcher(/B/g, Type.Block))
-  .fillWith(Type.Text)
-  .terminateWith(Type.Nul);
+const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
+  .add(new TokenMatcher(/B/g, Type.Block));
 
 const grammar = new Grammar<Type>()
   .add(new TextRule(Type.Text, t => `${t}`))
@@ -24,8 +21,7 @@ const grammar = new Grammar<Type>()
 
 test('it works', t => {
   const text = 'foo Ba';
-  const parser = new Parser(grammar)
-    .withFallbackRule(new TextRule(Type.Text, t => `${t}`));
+  const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
   const tokens = tokenizer.tokenize(text);
   const tree = parser.parse(tokens);

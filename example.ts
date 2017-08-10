@@ -1,96 +1,35 @@
-import Tokenizer from "./lib/Tokenizer";
-import TokenMatcher from "./lib/TokenMatcher";
-import Grammar from "./lib/Grammar";
-import TextRule from "./lib/rule/TextRule";
-import BlockRule from "./lib/rule/BlockRule";
-import ConstantRule from "./lib/rule/ConstantRule";
-import Parser from "./lib/Parser";
-import TokenKind from "./lib/TokenKind";
-import {
-  and,
-  closes,
-  opens,
-  or,
-  otherTokenAfter,
-  otherTokenBefore,
-  whitespaceBeforeOrAfter
-} from "./lib/utils/Conditions";
+import * as SlackLike from './examples/slack-like';
+import TokenizerDebugger from "./lib/debug/TokenizerDebugger";
 
-enum Type {
-  Nul,
-  Newline,
-  Quote,
-  Escape,
-  Url,
-  PseudoUrl,
-  Email,
-  Preformatted,
-  Text,
+const input = <HTMLInputElement>document.querySelector('#example-input');
+const type = <HTMLSelectElement>document.querySelector('#example-type');
+const output = <HTMLDivElement>document.querySelector('#output');
+const outputHTML = <HTMLDivElement>document.querySelector('#output-html');
+const tokens = <HTMLDivElement>document.querySelector('#tokens');
 
-  Bold,
-  Italics,
-  Strike,
-  Code,
-}
+input.oninput = () => {
+  const exampleType = type.value;
+  const exampleValue = input.value;
+  let parsed = '';
+  let visualized;
 
-const tokenizer = new Tokenizer<Type>()
-  .add(new TokenMatcher(/(\n)/g, Type.Newline))
-  .add(new TokenMatcher(/(>)/g, Type.Quote))
-  .add(new TokenMatcher(/(\\)/g, Type.Escape))
-  .add(new TokenMatcher(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi, Type.Url))
-  .add(new TokenMatcher(/\bwww\.\S+\b/gi, Type.PseudoUrl))
-  .add(new TokenMatcher(/\b(([\w+\-.]+)@\w+?(?:\.[a-zA-Z]{2,6}))+\b/gi, Type.Email))
-  .add(new TokenMatcher(/\b\S+\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)\S*\b/gi, Type.PseudoUrl))
-  .add(new TokenMatcher(/(\*)/g, Type.Bold, [
-    [or(opens, otherTokenBefore), TokenKind.Opens],
-    [or(closes, otherTokenAfter), TokenKind.Closes]
-  ]))
-  .add(new TokenMatcher(/(_)/g, Type.Italics, [
-    [or(opens, otherTokenBefore), TokenKind.Opens],
-    [or(closes, otherTokenAfter), TokenKind.Closes]
-  ]))
-  .add(new TokenMatcher(/(~)/g, Type.Strike, [
-    [or(opens, otherTokenBefore), TokenKind.Opens],
-    [or(closes, otherTokenAfter), TokenKind.Closes]
-  ]))
-  .add(new TokenMatcher(/(```)/g, Type.Preformatted, [
-    [and(whitespaceBeforeOrAfter), TokenKind.Default]
-  ]))
-  .add(new TokenMatcher(/(`)/g, Type.Code, [
-    [or(opens, otherTokenBefore), TokenKind.Opens],
-    [or(closes, otherTokenAfter), TokenKind.Closes]
-  ]))
-  .terminateWith(Type.Nul)
-  .fillWith(Type.Text);
+  switch (exampleType) {
+    case 'slacklike': {
+      const tokens = SlackLike.tokenizer.tokenize(exampleValue);
+      const node = SlackLike.parser.parse(tokens);
+      visualized = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
+      parsed = node.expand(exampleValue);
+      break;
+    }
+  }
 
-const grammar = new Grammar<Type>()
-  .add(new ConstantRule(Type.Newline, '<br>'))
-  .add(new ConstantRule(Type.Escape, ''))
-  .add(new TextRule(Type.Text, (text) => text))
-  .add(new TextRule(Type.Url, (text) => `<a href="${text}" target="_blank">${text}</a>`))
-  .add(new TextRule(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank">${text}</a>`))
-  .add(new TextRule(Type.Email, (text) => `<a href="mailto:${text}" target="_blank">${text}</a>`))
-  .add(new BlockRule(Type.Quote, Type.Newline, (children) => `<blockquote>${children}</blockquote>`))
-  .add(new BlockRule(Type.Quote, Type.Nul, (children) => `<blockquote>${children}</blockquote>`))
-  .add(new BlockRule(Type.Bold, Type.Bold, (children) => `<strong>${children}</strong>`, TokenKind.Opens, TokenKind.Closes))
-  .add(new BlockRule(Type.Italics, Type.Italics, (children) => `<i>${children}</i>`, TokenKind.Opens, TokenKind.Closes))
-  .add(new BlockRule(Type.Strike, Type.Strike, (children) => {
-    return `<strike>${children}</strike>`;
-  }, TokenKind.Opens, TokenKind.Closes))
-  .add(new BlockRule(Type.Preformatted, Type.Preformatted, (children) => {
-    return `<pre>${children}</pre>`
-  }))
-  .add(new BlockRule(Type.Code, Type.Code, (children) => `<code>${children}</code>`, TokenKind.Opens, TokenKind.Closes));
+  output.innerHTML = parsed;
+  outputHTML.innerText = parsed;
 
-const parser = new Parser(grammar)
-  .withFallbackRule(new TextRule(Type.Text, (text) => text));
+  if (visualized) {
+    tokens.innerHTML = '';
+    tokens.appendChild(visualized);
+  }
+};
 
-function render(text: string) {
-  const tokens = tokenizer.tokenize(text);
-  const tree = parser.parse(tokens);
-
-  // NOTE: the expanded text isn't escaped
-  return tree.expand(text);
-}
-
-export default render;
+export default true;

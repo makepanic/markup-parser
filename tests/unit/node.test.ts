@@ -1,5 +1,5 @@
 import test from 'ava';
-import RuleProperty from "../../lib/RuleProperty";
+import RuleProperty from "../../lib/rule/RuleProperty";
 import Node from "../../lib/Node";
 import TextRule from "../../lib/rule/TextRule";
 import Rule from "../../lib/rule/Rule";

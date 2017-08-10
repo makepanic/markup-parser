@@ -1,6 +1,5 @@
-import RuleProperty from "../RuleProperty";
+import RuleProperty from "./RuleProperty";
 import Rule from "./Rule";
-import TokenKind from "../TokenKind";
 
 class ConstantRule<T extends number> extends Rule<T> {
   constructor(open: T, display: string) {

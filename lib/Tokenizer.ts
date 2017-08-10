@@ -1,7 +1,6 @@
-import assert from './assert';
-import TokenMatcher from "./TokenMatcher";
-import Token from "./Token";
-import TokenKind from "./TokenKind";
+import TokenMatcher from "./token/TokenMatcher";
+import Token from "./token/Token";
+import TokenKind from "./token/TokenKind";
 
 declare type MatchRange<T extends number> = [number, number, TokenMatcher<T>];
 type TokenRange<T> = [number, number, T, TokenKind];
@@ -12,10 +11,11 @@ class Tokenizer<T extends number> {
   private escaper: string = '\\';
   private terminator: T;
 
-  constructor() {
+  constructor(filler: T, terminator: T, escaper: string = '\\') {
     this.matcher = [];
-    this.filler = undefined;
-    this.terminator = undefined;
+    this.filler = filler;
+    this.terminator = terminator;
+    this.escaper = escaper;
   }
 
   add(tokenMatcher: TokenMatcher<T>) {
@@ -23,26 +23,7 @@ class Tokenizer<T extends number> {
     return this;
   }
 
-  fillWith(type: T) {
-    this.filler = type;
-    return this;
-  }
-
-  escapeWith(escaper: string) {
-    this.escaper = escaper;
-    return this;
-  }
-
-  terminateWith(type: T) {
-    this.terminator = type;
-    return this;
-  }
-
   tokenize(str: string): Array<Token<T>> {
-    assert('tokenizer needs a filler before tokenizing a string', this.filler !== undefined);
-    assert('tokenizer needs a escape string.', this.escaper !== undefined);
-    assert('tokenizer needs a terminator.', this.terminator !== undefined);
-
     let tokens: Array<MatchRange<T>> = [];
     let splitString = str;
     let matchedRanges: Array<[number, number]> = [];

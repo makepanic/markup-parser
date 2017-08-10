@@ -1,8 +1,13 @@
-import Token from "../Token";
-import TokenKind from "../TokenKind";
+import Token from "../token/Token";
+import TokenKind from "../token/TokenKind";
 
-class TokenizerDebugger<T extends number> {
-  toHTMLElement(text: string, tokens: Array<Token<T>>) {
+class TokenizerDebugger {
+  static toHTMLElement<T extends number>(text: string, tokens: Array<Token<T>>): HTMLElement | undefined {
+    if (typeof document === 'undefined') {
+      console.warn('toHTMLElement requires document');
+      return;
+    }
+
     const p = document.createElement('div');
     p.className = 'tokens';
     tokens.forEach((token) => {

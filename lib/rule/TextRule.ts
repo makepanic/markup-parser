@@ -1,6 +1,5 @@
 import Rule from "./Rule";
-import RuleProperty from "../RuleProperty";
-import TokenKind from "../TokenKind";
+import RuleProperty from "./RuleProperty";
 
 class TextRule<T extends number> extends Rule<T> {
   constructor(open: T, display: (text: string) => string) {

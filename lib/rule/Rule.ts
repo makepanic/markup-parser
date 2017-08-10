@@ -1,5 +1,5 @@
-import RuleProperty from "../RuleProperty";
-import TokenKind from "../TokenKind";
+import RuleProperty from "./RuleProperty";
+import TokenKind from "../token/TokenKind";
 
 export interface DisplayFunction {
   (string: string): string;

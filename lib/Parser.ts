@@ -1,9 +1,9 @@
-import RuleProperty from "./RuleProperty";
+import RuleProperty from "./rule/RuleProperty";
 import Grammar from "./Grammar";
 import Node from "./Node";
 import Rule from "./rule/Rule";
-import Token from "./Token";
-import TokenKind from "./TokenKind";
+import Token from "./token/Token";
+import TokenKind from "./token/TokenKind";
 
 export interface PeekResult<T extends number> {
   idx: number,
@@ -12,15 +12,11 @@ export interface PeekResult<T extends number> {
 
 class Parser<T extends number> {
   private grammar: Grammar<T>;
-  private fallbackRule: Rule<T> = undefined;
+  private fallbackRule: Rule<T>;
 
-  constructor(grammar: Grammar<T>) {
+  constructor(grammar: Grammar<T>, fallbackRule: Rule<T>) {
     this.grammar = grammar;
-  }
-
-  withFallbackRule(rule: Rule<T>) {
-    this.fallbackRule = rule;
-    return this;
+    this.fallbackRule = fallbackRule;
   }
 
   peek(type: T, tokenKind: TokenKind, tokens: Array<Token<T>>): PeekResult<T> | undefined {
@@ -40,12 +36,11 @@ class Parser<T extends number> {
   }
 
   openRules(token: Token<T>): Array<Rule<T>> {
-    const rules = (this.grammar.ruleOpenLookup[+token.id] || [])
-      .filter(rule => (rule.openKind === token.kind || rule.openKind & token.kind));
-    return rules;
+    return (this.grammar.ruleOpenLookup[+token.id] || [])
+      .filter(rule => rule.openKind & token.kind);
   }
 
-  fallbackNodeForToken(token: Token<T>) {
+  fallbackNode(token: Token<T>) {
     return new Node<T>(this.fallbackRule, token.start, token.end);
   }
 
@@ -74,7 +69,7 @@ class Parser<T extends number> {
               // TODO: check if this can be reached with terminator
               // no closing rule, create text node
               token.consumed = true;
-              parent.appendChild(this.fallbackNodeForToken(token));
+              parent.appendChild(this.fallbackNode(token));
             }
           } else {
             // create node from token start to closing end
@@ -96,7 +91,7 @@ class Parser<T extends number> {
 
       if (!token.consumed) {
         token.consumed = true;
-        parent.appendChild(this.fallbackNodeForToken(token));
+        parent.appendChild(this.fallbackNode(token));
       }
     }
 
