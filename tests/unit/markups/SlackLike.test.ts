@@ -1,5 +1,5 @@
 import test from 'ava';
-import * as SlackLike from '../../examples/slack-like';
+import SlackLike from '../../../examples/SlackLike';
 
 const expectations = [
   ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank">https://www.google.com/myAccountUpperCase/foo</a> test'],
@@ -68,12 +68,10 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
   ['~test from phone~_1 w rt,_ *yay* €*', '<strike>test from phone</strike><i>1 w rt,</i> <strong>yay</strong> €*']
 ];
 
-function format(string: string) {
-  return SlackLike.parser.parse(SlackLike.tokenizer.tokenize(string)).expand(string);
-}
+const markup = new SlackLike();
 
 expectations.forEach(([input, expected]) => {
   test(input, t => {
-    t.is(format(input), expected);
+    t.is(markup.format(input), expected);
   });
 });

@@ -5,6 +5,7 @@ import TextRule from "../lib/rule/TextRule";
 import BlockRule from "../lib/rule/BlockRule";
 import ConstantRule from "../lib/rule/ConstantRule";
 import Parser from "../lib/Parser";
+import Node from "../lib/Node";
 import TokenKind from "../lib/token/TokenKind";
 import {
   and,
@@ -15,6 +16,8 @@ import {
   otherTokenBefore,
   whitespaceBeforeOrAfter
 } from "../lib/utils/Conditions";
+import IMarkup from "./IMarkup";
+import Token from "../lib/token/Token";
 
 export enum Type {
   Nul,
@@ -82,4 +85,18 @@ const grammar = new Grammar<Type>()
 
 const parser = new Parser(grammar, new TextRule(Type.Text, (text) => text));
 
-export {tokenizer, parser};
+class SlackLike implements IMarkup<Type> {
+  tokenize(input: string): Token<Type>[] {
+    return tokenizer.tokenize(input);
+  }
+
+  parse(tokens: Token<Type>[]): Node<Type> {
+    return parser.parse(tokens);
+  }
+
+  format(input: string) {
+    return this.parse(this.tokenize(input)).expand(input);
+  }
+}
+
+export default SlackLike;
