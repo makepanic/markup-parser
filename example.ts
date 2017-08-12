@@ -12,7 +12,7 @@ const markups: {[name: string]: IMarkup<any>} = {
   slacklike: new SlackLike()
 };
 
-input.oninput = () => {
+function handleInput(){
   const exampleType = type.value;
   const exampleValue = input.value;
   let parsed = '';
@@ -32,6 +32,11 @@ input.oninput = () => {
     tokens.innerHTML = '';
     tokens.appendChild(visualized);
   }
-};
+}
+
+input.oninput = () => handleInput();
+
+input.value = '*bold* _italics_ ~strike~ `code` ```preformatted``` >quote';
+handleInput();
 
 export default true;

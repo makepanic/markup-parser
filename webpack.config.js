@@ -30,7 +30,10 @@ module.exports = {
   },
   plugins: [
     new CopyWebpackPlugin([
-      {from: 'index.html', to: 'index.html'}
+      {from: 'index.html', to: 'index.html'},
+      {from: 'node_modules/spectre.css/dist/spectre.min.css', to: 'spectre.min.css'},
+      {from: 'node_modules/open-color/open-color.css', to: 'open-color.css'},
+      {from: 'example.css', to: 'example.css'},
     ])
   ]
 };

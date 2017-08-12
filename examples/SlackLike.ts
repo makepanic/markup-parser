@@ -86,6 +86,8 @@ const grammar = new Grammar<Type>()
 const parser = new Parser(grammar, new TextRule(Type.Text, (text) => text));
 
 class SlackLike implements IMarkup<Type> {
+  types = Type;
+
   tokenize(input: string): Token<Type>[] {
     return tokenizer.tokenize(input);
   }
