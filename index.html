@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="./node_modules/spectre.css/dist/spectre.min.css">
+  <link rel="stylesheet" href="./node_modules/open-color/open-color.css">
+  <link rel="stylesheet" href="./example.css">
+</head>
+<body>
+
+<div class="columns">
+  <div class="column">
+    <header class="navbar">
+      <section class="navbar-section">
+      </section>
+      <section class="navbar-center">
+        <a href="https://github.com/makepanic/markup-parser" target="_blank" rel="noopener" class="navbar-brand">markup-parser</a>
+      </section>
+      <section class="navbar-section">
+      </section>
+    </header>
+  </div>
+</div>
+
+<div class="container">
+  <div class="columns">
+    <div class="column col-4">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Input</div>
+        </div>
+        <div class="panel-body">
+          <form>
+            <div class="form-group">
+              <label for="example-type" class="form-label">Type</label>
+              <select class="form-select" name="" id="example-type">
+                <option value="slacklike">slacklike</option>
+                <!--<option value="commonmarklike" selected>commonmarklike</option>-->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="example-input" class="form-label">Input</label>
+              <textarea class="form-input" id="example-input" rows="10"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+    </div>
+    <div class="column col-8">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output HTML (innerHTML)</div>
+        </div>
+        <div class="panel-body">
+          <div id="output"></div>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output HTML (innerText)</div>
+        </div>
+        <div class="panel-body">
+          <div id="output-html"></div>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output tokens visualized</div>
+        </div>
+        <div class="panel-body">
+          <div id="tokens"></div>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./markup-parser.gh-pages.js"></script>
+<script>
+  (function(){require(['example'])}())
+</script>
+</body>
+</html>
