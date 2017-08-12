@@ -88,7 +88,7 @@ fabric.properties
 
 *.js
 *.js.map
+*.d.ts
 
 dist
 docs
-!webpack.config.js

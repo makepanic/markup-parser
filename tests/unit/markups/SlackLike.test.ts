@@ -1,6 +1,6 @@
 import Surku = require('surku');
 import test from 'ava';
-import SlackLike from '../../../examples/SlackLike';
+import SlackLike from '../../../markups/SlackLike';
 
 const expectations = [
   ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank">https://www.google.com/myAccountUpperCase/foo</a> test'],
@@ -81,7 +81,7 @@ test('fuzzer', t => {
   const newGenerator = new Surku();
 
   let sample = '*bold* _italics_ ~strike~ `code` ```preformatted``` >quote a `@foo ||= bar` `foo = bar` a `|` `a|a` `a|` `|a` ` |a`';
-  let i = 1000;
+  let i = 100;
 
   while (i--) {
     t.notThrows(() => {

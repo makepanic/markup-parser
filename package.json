@@ -4,10 +4,11 @@
   "description": "A set of primitives for building string markup parsers",
   "main": "index.js",
   "scripts": {
-    "pretest": "tsc",
-    "test": "nyc --reporter=html ava dist/tests/**/*.js",
-    "build": "webpack",
-    "start": "webpack-dev-server --open",
+    "pretest": "npm run build-test",
+    "test": "nyc --reporter=html ava 'dist/tests/**/*.js'",
+    "build": "tsc",
+    "build-test": "tsc -p tsconfig.test.json",
+    "build-gh-pages": "tsc -p tsconfig.gh-pages.json",
     "docs": "typedoc --out docs --mode file lib"
   },
   "repository": {
@@ -18,16 +19,12 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.21.0",
-    "copy-webpack-plugin": "^4.0.1",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
-    "source-map-loader": "^0.2.1",
     "spectre.css": "^0.2.14",
     "surku": "^0.1.14",
-    "ts-loader": "^2.3.2",
     "typedoc": "^0.8.0",
-    "typescript": "^2.4.2",
-    "webpack": "^3.4.1",
-    "webpack-dev-server": "^2.6.1"
-  }
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {}
 }

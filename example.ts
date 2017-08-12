@@ -1,6 +1,6 @@
-import SlackLike from './examples/SlackLike';
+import SlackLike from './markups/SlackLike';
 import TokenizerDebugger from "./lib/debug/TokenizerDebugger";
-import IMarkup from "./examples/IMarkup";
+import IMarkup from "./markups/IMarkup";
 
 const input = <HTMLInputElement>document.querySelector('#example-input');
 const type = <HTMLSelectElement>document.querySelector('#example-type');
