@@ -74,3 +74,8 @@ test('expands nested nodes', function (t) {
   t.is(rootNode.expand('I\'m sorry Dave, I\'m afraid I can\'t do that'),
     'I\'m sorry (☞ﾟヮﾟ)☞ Dave ☜(ﾟヮﾟ☜), I\'m afraid I can\'t do that');
 });
+
+test('expand always returns a string even without rule', t => {
+  const node = new Node<Types>();
+  t.is(node.expand('foo'), '')
+});
