@@ -23,21 +23,21 @@ class Tokenizer<T extends number> {
     return this;
   }
 
-  tokenize(str: string): Array<Token<T>> {
+  tokenize(string: string): Array<Token<T>> {
     let tokens: Array<MatchRange<T>> = [];
-    let splitString = str;
     let matchedRanges: Array<[number, number]> = [];
+    const tokensWithText: Array<TokenRange<T>> = [];
 
     //create list of tokens
     this.matcher.forEach((matcher) => {
       let match;
 
       // go through all matchers and try to regex match
-      while ((match = matcher.regex.exec(splitString)) != null) {
+      while ((match = matcher.regex.exec(string)) !== null) {
         const start = match.index;
         const end = start + match[0].length;
 
-        if (str.substring(start - 1, start) !== this.escaper) {
+        if (string[start - 1] !== this.escaper) {
           const rangeAlreadyTokenized = matchedRanges.some(([rangeStart, rangeEnd]) => {
             return !(end <= rangeStart || start >= rangeEnd);
           });
@@ -50,41 +50,32 @@ class Tokenizer<T extends number> {
       }
     });
 
-    // insert text infos between tokens
-    const tokensWithText: Array<[number, number, T, TokenKind]> = [];
-
     let lastEnd = 0;
 
     tokens
       .sort(([startA], [startB]) => startA - startB)
-      .map(([start, end, matcher], index, tokens) => {
+      .forEach(([start, end, matcher], index, tokens) => {
         // find matching constraint
         const matchingConstraints = matcher.constraints
-          .filter(([constraint]) => constraint(str, start, end, index, tokens));
+          .filter(([constraint]) => constraint(string, start, end, index, tokens));
 
         if (matchingConstraints.length) {
-          let mergedKinds = matchingConstraints.reduce((all, [, kind]) => {
-            return all | kind;
-          }, TokenKind.Default);
+          let mergedKinds = matchingConstraints.reduce((all, [, kind]) => all | kind, TokenKind.Default);
           // [n, m, Bold, Closes]
-          return [start, end, matcher.id, mergedKinds];
+          let token: TokenRange<T> = [start, end, matcher.id, mergedKinds];
+          tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
+          tokensWithText.push(token);
+          lastEnd = end;
         }
-      })
-      .filter(t => t !== undefined)
-      .forEach((token: TokenRange<T>) => {
-        const [start, end] = token;
-        tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
-        tokensWithText.push(token);
-        lastEnd = end;
       });
 
-    tokensWithText.push([lastEnd, str.length, this.filler, TokenKind.Default]);
+    tokensWithText.push([lastEnd, string.length, this.filler, TokenKind.Default]);
 
     const allTokens = tokensWithText
       .filter(([start, end]) => start < end)
       .map(([start, end, format, kind]) => new Token<T>(start, end, format, kind));
 
-    allTokens.push(new Token<T>(lastEnd + str.length, lastEnd + str.length, this.terminator));
+    allTokens.push(new Token<T>(lastEnd + string.length, lastEnd + string.length, this.terminator));
 
     return allTokens;
   }

@@ -1,7 +1,8 @@
 {
   "include": [
     "lib/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "targets/**/*.ts"
   ],
   "sourceMap": true,
   "compilerOptions": {

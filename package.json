@@ -6,6 +6,8 @@
   "scripts": {
     "pretest": "npm run build-test",
     "test": "nyc --reporter=html ava 'dist/tests/**/*.js'",
+    "posttest": "npm run bench",
+    "bench": "node dist/targets/bench.js",
     "build": "tsc",
     "build-test": "tsc -p tsconfig.test.json",
     "build-gh-pages": "tsc -p tsconfig.gh-pages.json",
@@ -18,7 +20,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/benchmark": "^1.0.30",
     "ava": "^0.21.0",
+    "benchmark": "^2.1.4",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
     "spectre.css": "^0.2.14",

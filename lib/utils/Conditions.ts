@@ -7,10 +7,10 @@ export type condition = (str: string, start: number, end?: number) => boolean;
 export const and = (...fns: any[]) => (...args: any[]) => fns.every(fn => fn(...args));
 export const or = (...fns: any[]) => (...args: any[]) => fns.some(fn => fn(...args));
 
-export const startOfString: condition = (str: string, start: number) => str.substring(start - 1, start) === '';
-export const endOfString: condition = (str: string, start: number, end: number) => str.substring(end, end + 1) === '';
-export const whitespaceBefore: condition = (str: string, start: number) => WHITEPSPACE_DELIMITER.test(str.substring(start - 1, start));
-export const whitespaceAfter: condition = (str: string, start: number, end: number) => WHITEPSPACE_DELIMITER.test(str.substring(end, end + 1));
+export const startOfString: condition = (str: string, start: number) => start === 0;
+export const endOfString: condition = (str: string, start: number, end: number) => end === str.length;
+export const whitespaceBefore: condition = (str: string, start: number) => WHITEPSPACE_DELIMITER.test(str[start - 1]);
+export const whitespaceAfter: condition = (str: string, start: number, end: number) => WHITEPSPACE_DELIMITER.test(str[end]);
 export const whitespaceBeforeOrAfter: condition = or(whitespaceBefore, whitespaceAfter, startOfString, endOfString);
 
 export const opens = or(whitespaceBefore, startOfString);
