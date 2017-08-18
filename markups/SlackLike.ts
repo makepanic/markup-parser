@@ -14,6 +14,7 @@ import {
   or,
   otherTokenAfter,
   otherTokenBefore,
+  whitespaceBefore,
   whitespaceBeforeOrAfter
 } from "../lib/utils/Conditions";
 import IMarkup from "./IMarkup";
@@ -38,7 +39,9 @@ export enum Type {
 
 const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
   .add(new TokenMatcher(/(\n)/g, Type.Newline))
-  .add(new TokenMatcher(/(>)/g, Type.Quote))
+  .add(new TokenMatcher(/(>)/g, Type.Quote, [
+    [whitespaceBefore, TokenKind.Default]
+  ]))
   .add(new TokenMatcher(/(\\)/g, Type.Escape))
   .add(new TokenMatcher(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi, Type.Url))
   .add(new TokenMatcher(/\bwww\.\S+\b/gi, Type.PseudoUrl))
@@ -68,9 +71,9 @@ const grammar = new Grammar<Type>()
   .add(new ConstantRule(Type.Newline, '<br>'))
   .add(new ConstantRule(Type.Escape, ''))
   .add(new TextRule(Type.Text, (text) => text))
-  .add(new TextRule(Type.Url, (text) => `<a href="${text}" target="_blank">${text}</a>`))
-  .add(new TextRule(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank">${text}</a>`))
-  .add(new TextRule(Type.Email, (text) => `<a href="mailto:${text}" target="_blank">${text}</a>`))
+  .add(new TextRule(Type.Url, (text) => `<a href="${text}" target="_blank" rel="noopener noreferrer">${text}</a>`))
+  .add(new TextRule(Type.PseudoUrl, (text) => `<a href="http://${text}" target="_blank" rel="noopener noreferrer">${text}</a>`))
+  .add(new TextRule(Type.Email, (text) => `<a href="mailto:${text}" target="_blank" rel="noopener noreferrer">${text}</a>`))
   .add(new BlockRule(Type.Quote, Type.Newline, (children) => `<blockquote>${children}</blockquote>`))
   .add(new BlockRule(Type.Quote, Type.Nul, (children) => `<blockquote>${children}</blockquote>`))
   .add(new BlockRule(Type.Bold, Type.Bold, (children) => `<strong>${children}</strong>`, TokenKind.Opens, TokenKind.Closes))

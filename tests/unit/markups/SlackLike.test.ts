@@ -3,8 +3,8 @@ import test from 'ava';
 import SlackLike from '../../../markups/SlackLike';
 
 const expectations = [
-  ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank">https://www.google.com/myAccountUpperCase/foo</a> test'],
-  ['test user@goOgle.com test', 'test <a href="mailto:user@goOgle.com" target="_blank">user@goOgle.com</a> test'],
+  ['test https://www.google.com/myAccountUpperCase/foo test', 'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank" rel="noopener noreferrer">https://www.google.com/myAccountUpperCase/foo</a> test'],
+  ['test user@goOgle.com test', 'test <a href="mailto:user@goOgle.com" target="_blank" rel="noopener noreferrer">user@goOgle.com</a> test'],
   ['a \\*a* a *a* a*', 'a *a* a <strong>a</strong> a*'],
   [`
     > quote
@@ -29,13 +29,13 @@ const expectations = [
   ['wasd *wasd*,wasd\nwasd *wasd*!wasd\nwasd ,*wasd* wasd', 'wasd <strong>wasd</strong>,wasd<br>wasd <strong>wasd</strong>!wasd<br>wasd ,<strong>wasd</strong> wasd'],
   ['a *a* *a* a *a* a *a* a', 'a <strong>a</strong> <strong>a</strong> a <strong>a</strong> a <strong>a</strong> a'],
   ['a *a _a a a ~a* a', 'a <strong>a _a a a ~a</strong> a'],
-  ['a https://xkcd.com/ a', 'a <a href="https://xkcd.com/" target="_blank">https://xkcd.com/</a> a'],
-  ['a https://xkcd.com/about/ a', 'a <a href="https://xkcd.com/about/" target="_blank">https://xkcd.com/about/</a> a'],
-  ['a www.xkcd.com a', 'a <a href="http://www.xkcd.com" target="_blank">www.xkcd.com</a> a'],
-  ['a www.xkcd.com/about a', 'a <a href="http://www.xkcd.com/about" target="_blank">www.xkcd.com/about</a> a'],
-  ['a xkcd.com a', 'a <a href="http://xkcd.com" target="_blank">xkcd.com</a> a'],
-  ['a xkcd.com/about a', 'a <a href="http://xkcd.com/about" target="_blank">xkcd.com/about</a> a'],
-  ['a test_foo+spamblock@mail.de a', 'a <a href="mailto:test_foo+spamblock@mail.de" target="_blank">test_foo+spamblock@mail.de</a> a'],
+  ['a https://xkcd.com/ a', 'a <a href="https://xkcd.com/" target="_blank" rel="noopener noreferrer">https://xkcd.com/</a> a'],
+  ['a https://xkcd.com/about/ a', 'a <a href="https://xkcd.com/about/" target="_blank" rel="noopener noreferrer">https://xkcd.com/about/</a> a'],
+  ['a www.xkcd.com a', 'a <a href="http://www.xkcd.com" target="_blank" rel="noopener noreferrer">www.xkcd.com</a> a'],
+  ['a www.xkcd.com/about a', 'a <a href="http://www.xkcd.com/about" target="_blank" rel="noopener noreferrer">www.xkcd.com/about</a> a'],
+  ['a xkcd.com a', 'a <a href="http://xkcd.com" target="_blank" rel="noopener noreferrer">xkcd.com</a> a'],
+  ['a xkcd.com/about a', 'a <a href="http://xkcd.com/about" target="_blank" rel="noopener noreferrer">xkcd.com/about</a> a'],
+  ['a test_foo+spamblock@mail.de a', 'a <a href="mailto:test_foo+spamblock@mail.de" target="_blank" rel="noopener noreferrer">test_foo+spamblock@mail.de</a> a'],
   ['a *a _a a_ _a ~a* a', 'a <strong>a <i>a a</i> _a ~a</strong> a'],
   ['wasd \\*wasd\\*, \\_wasd\\_\nwasd \\*wasd\\*!wasd\nwasd ,\\*wasd\\* wasd', 'wasd *wasd*, _wasd_<br>wasd *wasd*!wasd<br>wasd ,*wasd* wasd'],
   ['_test_', '<i>test</i>'],
@@ -67,7 +67,8 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
   ],
   ['foo *bar _baz_* foo', 'foo <strong>bar <i>baz</i></strong> foo'],
   ['~test from phone~_1 w rt,_ *yay* €*', '<strike>test from phone</strike><i>1 w rt,</i> <strong>yay</strong> €*'],
-  ['test from phone_1 w rt,_ *yay* ~€~', 'test from phone_1 w rt,_ <strong>yay</strong> <strike>€</strike>']
+  ['test from phone_1 w rt,_ *yay* ~€~', 'test from phone_1 w rt,_ <strong>yay</strong> <strike>€</strike>'],
+  ['… <em>test</em> …', '… <em>test</em> …'],
 ];
 
 const markup = new SlackLike();
