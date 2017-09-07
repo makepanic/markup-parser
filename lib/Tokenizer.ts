@@ -8,10 +8,10 @@ type TokenRange<T> = [number, number, T, TokenKind];
 class Tokenizer<T extends number> {
   private matcher: Array<TokenMatcher<T>>;
   private filler: T;
-  private escaper: string = '\\';
+  private escaper: string = "\\";
   private terminator: T;
 
-  constructor(filler: T, terminator: T, escaper: string = '\\') {
+  constructor(filler: T, terminator: T, escaper: string = "\\") {
     this.matcher = [];
     this.filler = filler;
     this.terminator = terminator;
@@ -29,7 +29,7 @@ class Tokenizer<T extends number> {
     const tokensWithText: Array<TokenRange<T>> = [];
 
     //create list of tokens
-    this.matcher.forEach((matcher) => {
+    this.matcher.forEach(matcher => {
       let match;
 
       // go through all matchers and try to regex match
@@ -38,9 +38,11 @@ class Tokenizer<T extends number> {
         const end = start + match[0].length;
 
         if (string[start - 1] !== this.escaper) {
-          const rangeAlreadyTokenized = matchedRanges.some(([rangeStart, rangeEnd]) => {
-            return !(end <= rangeStart || start >= rangeEnd);
-          });
+          const rangeAlreadyTokenized = matchedRanges.some(
+            ([rangeStart, rangeEnd]) => {
+              return !(end <= rangeStart || start >= rangeEnd);
+            }
+          );
 
           if (!rangeAlreadyTokenized) {
             matchedRanges.push([start, end]);
@@ -56,11 +58,15 @@ class Tokenizer<T extends number> {
       .sort(([startA], [startB]) => startA - startB)
       .forEach(([start, end, matcher], index, tokens) => {
         // find matching constraint
-        const matchingConstraints = matcher.constraints
-          .filter(([constraint]) => constraint(string, start, end, index, tokens));
+        const matchingConstraints = matcher.constraints.filter(([constraint]) =>
+          constraint(string, start, end, index, tokens)
+        );
 
         if (matchingConstraints.length) {
-          let mergedKinds = matchingConstraints.reduce((all, [, kind]) => all | kind, TokenKind.Default);
+          let mergedKinds = matchingConstraints.reduce(
+            (all, [, kind]) => all | kind,
+            TokenKind.Default
+          );
           // [n, m, Bold, Closes]
           let token: TokenRange<T> = [start, end, matcher.id, mergedKinds];
           tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
@@ -69,13 +75,26 @@ class Tokenizer<T extends number> {
         }
       });
 
-    tokensWithText.push([lastEnd, string.length, this.filler, TokenKind.Default]);
+    tokensWithText.push([
+      lastEnd,
+      string.length,
+      this.filler,
+      TokenKind.Default
+    ]);
 
     const allTokens = tokensWithText
       .filter(([start, end]) => start < end)
-      .map(([start, end, format, kind]) => new Token<T>(start, end, format, kind));
+      .map(
+        ([start, end, format, kind]) => new Token<T>(start, end, format, kind)
+      );
 
-    allTokens.push(new Token<T>(lastEnd + string.length, lastEnd + string.length, this.terminator));
+    allTokens.push(
+      new Token<T>(
+        lastEnd + string.length,
+        lastEnd + string.length,
+        this.terminator
+      )
+    );
 
     return allTokens;
   }

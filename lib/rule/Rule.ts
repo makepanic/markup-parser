@@ -12,14 +12,24 @@ class Rule<T extends number> {
   readonly closesKind: TokenKind;
   readonly display: DisplayFunction;
   readonly properties: RuleProperty;
+  readonly occludes: boolean = false;
 
-  constructor(open: T, close: T, properties: RuleProperty, display: DisplayFunction, openKind = TokenKind.Default, closesKind = TokenKind.Default) {
+  constructor(
+    open: T,
+    close: T,
+    properties: RuleProperty,
+    display: DisplayFunction,
+    openKind = TokenKind.Default,
+    closesKind = TokenKind.Default,
+    occludes = false
+  ) {
     this.properties = properties;
     this.display = display;
     this.open = open;
     this.close = close;
     this.openKind = openKind;
     this.closesKind = closesKind;
+    this.occludes = occludes;
   }
 }
 

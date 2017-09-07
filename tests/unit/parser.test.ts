@@ -1,4 +1,4 @@
-import test from 'ava';
+import test from "ava";
 import Parser from "../../lib/Parser";
 import Grammar from "../../lib/Grammar";
 import TextRule from "../../lib/rule/TextRule";
@@ -17,16 +17,16 @@ enum Type {
   C
 }
 
-const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
-  .add(new TokenMatcher(/B/g, Type.Block));
+const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul).add(
+  new TokenMatcher(/B/g, Type.Block)
+);
 
 const grammar = new Grammar<Type>()
   .add(new TextRule(Type.Text, t => `${t}`))
-  .add(new BlockRule(Type.Block, Type.Block, children => `[B]${children}[/B]`))
-;
+  .add(new BlockRule(Type.Block, Type.Block, children => `[B]${children}[/B]`));
 
-test('it works', t => {
-  const text = 'foo Ba';
+test("it works", t => {
+  const text = "foo Ba";
   const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
   const tokens = tokenizer.tokenize(text);
@@ -34,27 +34,29 @@ test('it works', t => {
 
   const expanded = tree.expand(text);
 
-  t.is(expanded, 'foo Ba');
+  t.is(expanded, "foo Ba");
 });
 
-test('peek is bitmask aware', t => {
+test("peek is bitmask aware", t => {
   const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
   const tokens: Array<Token<Type>> = [
     new Token(0, 1, Type.A, TokenKind.Default | TokenKind.Closes),
-    new Token(3, 4, Type.B, TokenKind.Default | TokenKind.Closes | TokenKind.Opens),
+    new Token(
+      3,
+      4,
+      Type.B,
+      TokenKind.Default | TokenKind.Closes | TokenKind.Opens
+    )
   ];
 
-  t.deepEqual(
-    parser.peek(Type.B, TokenKind.Closes, tokens),
-    {idx: 1, token: tokens[1]}
-  );
-  t.deepEqual(
-    parser.peek(Type.B, TokenKind.Opens, tokens),
-    {idx: 1, token: tokens[1]}
-  );
-  t.is(
-    parser.peek(Type.A, TokenKind.Opens, tokens),
-    undefined
-  );
+  t.deepEqual(parser.peek(Type.B, TokenKind.Closes, tokens), {
+    idx: 1,
+    token: tokens[1]
+  });
+  t.deepEqual(parser.peek(Type.B, TokenKind.Opens, tokens), {
+    idx: 1,
+    token: tokens[1]
+  });
+  t.is(parser.peek(Type.A, TokenKind.Opens, tokens), undefined);
 });

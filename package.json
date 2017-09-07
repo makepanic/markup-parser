@@ -11,7 +11,8 @@
     "build": "tsc",
     "build-test": "tsc -p tsconfig.test.json",
     "build-gh-pages": "tsc -p tsconfig.gh-pages.json",
-    "docs": "typedoc --out docs --mode file lib"
+    "docs": "typedoc --out docs --mode file lib",
+    "prettier": "prettier --write '{lib,markups,tests}/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -25,10 +26,14 @@
     "benchmark": "^2.1.4",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
+    "prettier": "^1.6.1",
     "spectre.css": "^0.2.14",
     "surku": "^0.1.14",
     "typedoc": "^0.8.0",
     "typescript": "^2.4.2"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "prettier": {
+    "parser": "typescript"
+  }
 }

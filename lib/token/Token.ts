@@ -8,7 +8,12 @@ class Token<T extends number> {
   id: T;
   consumed: boolean = false;
 
-  constructor(start: number, end: number, id: T, kind: TokenKind = TokenKind.Default) {
+  constructor(
+    start: number,
+    end: number,
+    id: T,
+    kind: TokenKind = TokenKind.Default
+  ) {
     this.start = start;
     this.end = end;
     this.id = id;

@@ -2,7 +2,7 @@ import Rule from "./rule/Rule";
 
 class Grammar<T extends number> {
   readonly rules: Array<Rule<T>> = [];
-  readonly ruleOpenLookup: {[key: number]: Array<Rule<T>>} = {};
+  readonly ruleOpenLookup: { [key: number]: Array<Rule<T>> } = {};
 
   add(rule: Rule<T>) {
     this.rules.push(rule);

@@ -25,10 +25,12 @@ class Node<T extends number> {
       if (tree.rule) {
         return tree.rule.display(string.substring(tree.start, tree.end));
       } else {
-        return '';
+        return "";
       }
     } else {
-      let childString = tree.children.map(child => child.expand(string)).join('');
+      let childString = tree.children
+        .map(child => child.expand(string))
+        .join("");
 
       if (tree.rule) {
         return tree.rule.display(childString);
