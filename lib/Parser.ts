@@ -89,10 +89,11 @@ class Parser<T extends number> {
               // occluded tokens create a fallback rule in range
               tokens
                 .slice(index + 1, index + 1 + closing.idx)
-                .forEach(token => {
-                  token.consumed = true;
-                  node.appendChild(this.fallbackNode(token));
-                });
+                .forEach(token => (token.consumed = true));
+
+              node.appendChild(
+                new Node<T>(this.fallbackRule, token.end, closing.token.start)
+              );
             } else {
               this.parse(
                 tokens.slice(index + 1, index + 1 + closing.idx),
