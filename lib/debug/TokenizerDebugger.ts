@@ -28,7 +28,7 @@ class TokenizerDebugger {
       );
       tokenHead.innerText = `${token.id} ${tokenKindStrings
         .filter(Boolean)
-        .join("|")}`;
+        .join("|")} (${token.start}..${token.end})`;
       tokenDiv.appendChild(tokenHead);
 
       const tokenText = document.createElement("div");

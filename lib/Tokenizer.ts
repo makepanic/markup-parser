@@ -88,13 +88,7 @@ class Tokenizer<T extends number> {
         ([start, end, format, kind]) => new Token<T>(start, end, format, kind)
       );
 
-    allTokens.push(
-      new Token<T>(
-        lastEnd + string.length,
-        lastEnd + string.length,
-        this.terminator
-      )
-    );
+    allTokens.push(new Token<T>(string.length, string.length, this.terminator));
 
     return allTokens;
   }

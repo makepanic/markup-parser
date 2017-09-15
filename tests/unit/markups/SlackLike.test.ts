@@ -4,6 +4,10 @@ import SlackLike from "../../../markups/SlackLike";
 
 const expectations = [
   [
+    "https://bbla.com/_hey_.pdf",
+    '<a href="https://bbla.com/_hey_.pdf" target="_blank" rel="noopener noreferrer">https://bbla.com/_hey_.pdf</a>'
+  ],
+  [
     "test https://www.google.com/myAccountUpperCase/foo test",
     'test <a href="https://www.google.com/myAccountUpperCase/foo" target="_blank" rel="noopener noreferrer">https://www.google.com/myAccountUpperCase/foo</a> test'
   ],

@@ -10,7 +10,6 @@ Check out `example.ts` to see how to use the tokenizer + parser with any given s
 
 TODO: 
 - docs
-- allow Rules to guard child rules from being parsed (i.e. code block shouldn't parse its content)
 
 ## Architecture
 
