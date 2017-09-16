@@ -18,7 +18,7 @@ class BlockRule<T extends number> extends Rule<T> {
       open,
       close,
       RuleProperty.Block,
-      text => display(text),
+      display,
       kindOpen,
       kindClosed,
       occludes

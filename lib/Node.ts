@@ -3,7 +3,7 @@ import Rule from "./rule/Rule";
 class Node<T extends number> {
   readonly rule: Rule<T>;
   readonly start: number;
-  readonly end: number;
+  end: number;
   readonly children: Array<Node<T>> = [];
   parentNode: Node<T> = undefined;
 

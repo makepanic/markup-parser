@@ -113,7 +113,14 @@ class Parser<T extends number> {
 
       if (!token.consumed) {
         token.consumed = true;
-        parent.appendChild(this.fallbackNode(token));
+        const previousChild = parent.children[parent.children.length - 1];
+
+        if (previousChild && previousChild.rule === this.fallbackRule) {
+          // if previous node is fallbackRule, simply extend end to current token end to avoid additional node
+          previousChild.end = token.end;
+        } else {
+          parent.appendChild(this.fallbackNode(token));
+        }
       }
     }
 

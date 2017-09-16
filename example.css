@@ -157,3 +157,56 @@ body {
 .token--11 .token__head{background-color: var(--oc-yellow-6);}
 .token--12{background-color: var(--oc-orange-8);border-color: var(--oc-orange-8);}
 .token--12 .token__head{background-color: var(--oc-orange-6);}
+
+#output-tree{
+  text-align: center;
+  font-family: Iosevka, monospace;
+}
+.node {
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  padding: 2px;
+}
+.node:not(.node--root) {
+  margin-left: 2px;
+  margin-right: 2px;
+  background: var(--oc-gray-0);
+  border: 1px solid var(--oc-gray-3);
+}
+
+.node__rule {
+  color: var(--oc-white);
+  flex: 1;
+  padding: 2px 5px;
+}
+.node__text {
+  background: var(--oc-white);
+  padding: 2px 5px;
+}
+.node__children {
+  flex: 2;
+  margin-top: 2px;
+}
+.node__content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.node__children > .node:not(:first-child) {
+  border-top: 0;
+}
+
+.node__rule--0 {background-color: var(--oc-gray-8);}
+.node__rule--1 {background-color: var(--oc-red-8);}
+.node__rule--2 {background-color: var(--oc-pink-8);}
+.node__rule--3 {background-color: var(--oc-grape-8);}
+.node__rule--4 {background-color: var(--oc-violet-8);}
+.node__rule--5 {background-color: var(--oc-indigo-8);}
+.node__rule--6 {background-color: var(--oc-blue-8);}
+.node__rule--7 {background-color: var(--oc-cyan-8);}
+.node__rule--8 {background-color: var(--oc-teal-8);}
+.node__rule--9 {background-color: var(--oc-green-8);}
+.node__rule--10{background-color: var(--oc-lime-8);}
+.node__rule--11{background-color: var(--oc-yellow-8);}
+.node__rule--12{background-color: var(--oc-orange-8);}

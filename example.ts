@@ -1,11 +1,13 @@
 import SlackLike from "./markups/SlackLike";
 import TokenizerDebugger from "./lib/debug/TokenizerDebugger";
+import NodeDebugger from "./lib/debug/NodeDebugger";
 import IMarkup from "./markups/IMarkup";
 
 const input = <HTMLInputElement>document.querySelector("#example-input");
 const type = <HTMLSelectElement>document.querySelector("#example-type");
 const output = <HTMLDivElement>document.querySelector("#output");
 const outputHTML = <HTMLDivElement>document.querySelector("#output-html");
+const outputTree = <HTMLDivElement>document.querySelector("#output-tree");
 const tokens = <HTMLDivElement>document.querySelector("#tokens");
 
 const markups: { [name: string]: IMarkup<any> } = {
@@ -16,21 +18,31 @@ function handleInput() {
   const exampleType = type.value;
   const exampleValue = input.value;
   let parsed = "";
-  let visualized;
+  let visualizedTokens;
+  let visualizedTree;
 
   if (markups[exampleType]) {
     let markup = markups[exampleType];
     const tokens = markup.tokenize(exampleValue);
-    visualized = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
-    parsed = markup.parse(tokens).expand(exampleValue);
+    const node = markup.parse(tokens);
+
+    visualizedTree = NodeDebugger.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
+    visualizedTokens = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
+
+    parsed = node.expand(exampleValue);
   }
 
   output.innerHTML = parsed;
   outputHTML.innerText = parsed;
 
-  if (visualized) {
+  if (visualizedTokens) {
     tokens.innerHTML = "";
-    tokens.appendChild(visualized);
+    tokens.appendChild(visualizedTokens);
+  }
+
+  if (visualizedTree) {
+    outputTree.innerHTML = '';
+    outputTree.appendChild(visualizedTree);
   }
 }
 
@@ -38,5 +50,7 @@ input.oninput = () => handleInput();
 
 input.value = "*bold* _italics_ ~strike~ `code` ```preformatted``` >quote";
 handleInput();
+
+
 
 export default true;

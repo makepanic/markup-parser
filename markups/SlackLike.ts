@@ -94,7 +94,6 @@ const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
 const grammar = new Grammar<Type>()
   .add(new ConstantRule(Type.Newline, "<br>"))
   .add(new ConstantRule(Type.Escape, ""))
-  .add(new TextRule(Type.Text, text => text))
   .add(
     new TextRule(
       Type.Url,

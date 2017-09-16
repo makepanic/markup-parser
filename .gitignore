@@ -92,3 +92,6 @@ fabric.properties
 
 dist
 docs
+
+!d3.js
+!require.min.js
