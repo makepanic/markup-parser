@@ -261,6 +261,17 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
                 var _loop_1 = function () {
                     var start = match.index;
                     var end = start + match[0].length;
+                    // TODO: build lookuptable for already matched
+                    /*
+                    {
+                      2: true
+            
+                      [4]: look right, look left, look 2 right, look 2 left, ...
+                      5: true
+                    }
+            
+                    is 4 matched?
+                     */
                     if (string[start - 1] !== _this.escaper) {
                         var rangeAlreadyTokenized = matchedRanges.some(function (_a) {
                             var rangeStart = _a[0], rangeEnd = _a[1];
@@ -325,6 +336,63 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
     }());
     exports.default = Tokenizer;
 });
+define("lib/debug/NodeDebugger", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function nest(string, node, parentNode) {
+        var wrapper = document.createElement('div');
+        var content = document.createElement('div');
+        if (!node.parentNode) {
+            wrapper.classList.add('node--root');
+        }
+        wrapper.classList.add('node');
+        content.className = 'node__content';
+        wrapper.appendChild(content);
+        if (node.rule) {
+            var opens = document.createElement('div');
+            opens.className = "node__rule node__rule--open node__rule--" + node.rule.open;
+            opens.innerText = "" + node.rule.open;
+            content.appendChild(opens);
+        }
+        if (node.children.length) {
+            var children_1 = document.createElement('div');
+            children_1.className = 'node__children';
+            node.children.forEach(function (childNode) {
+                nest(string, childNode, children_1);
+            });
+            content.appendChild(children_1);
+        }
+        else {
+            // create text
+            var text = document.createElement('div');
+            text.className = 'node__text';
+            text.innerText = string.substring(node.start, node.end);
+            content.appendChild(text);
+        }
+        if (node.rule && node.rule.close >= 0) {
+            var closes = document.createElement('div');
+            closes.className = "node__rule node__rule--open node__rule--" + node.rule.close;
+            closes.innerText = "" + node.rule.close;
+            content.appendChild(closes);
+        }
+        parentNode.appendChild(wrapper);
+    }
+    var NodeDebugger = /** @class */ (function () {
+        function NodeDebugger() {
+        }
+        NodeDebugger.toHTMLElement = function (string, node, width, height) {
+            if (typeof document === "undefined") {
+                console.warn("toHTMLElement requires document");
+                return;
+            }
+            var root = document.createElement('div');
+            nest(string, node, root);
+            return root;
+        };
+        return NodeDebugger;
+    }());
+    exports.default = NodeDebugger;
+});
 define("lib/debug/TokenizerDebugger", ["require", "exports", "lib/token/TokenKind"], function (require, exports, TokenKind_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -375,7 +443,7 @@ define("lib/rule/BlockRule", ["require", "exports", "lib/rule/RuleProperty", "li
             if (kindOpen === void 0) { kindOpen = TokenKind_6.default.Default; }
             if (kindClosed === void 0) { kindClosed = TokenKind_6.default.Default; }
             if (occludes === void 0) { occludes = false; }
-            return _super.call(this, open, close, RuleProperty_2.default.Block, function (text) { return display(text); }, kindOpen, kindClosed, occludes) || this;
+            return _super.call(this, open, close, RuleProperty_2.default.Block, display, kindOpen, kindClosed, occludes) || this;
         }
         return BlockRule;
     }(Rule_1.default));
@@ -481,6 +549,49 @@ define("lib/utils/Conditions", ["require", "exports"], function (require, export
         }
     };
 });
+var RangeType;
+(function (RangeType) {
+    RangeType[RangeType["start"] = 0] = "start";
+    RangeType[RangeType["end"] = 1] = "end";
+})(RangeType || (RangeType = {}));
+/*
+
+left smaller
+right bigger
+
+    7
+  3   4
+1 - 2
+
+ */
+// class RangeNode {
+//   left: RangeNode;
+//   right: RangeNode;
+//   type: RangeType;
+//   value: number;
+//
+//   insert(number: number, type: RangeType, parent: RangeNode = this) {
+//     if (this.left.value > number) {
+//        this.insert(number, type, this.left);
+//     } else if(this.right.value < number) {
+//       this.insert(number, type, this.right);
+//     }
+//   }
+//
+//   intersects(start: number, end: number) {
+//
+//   }
+// }
+//
+// const tree = new RangeNode();
+// tree.insert(2, RangeType.start);
+// tree.insert(4, RangeType.end);
+// tree.insert(6, RangeType.start);
+// tree.insert(10, RangeType.end);
+//
+// if (tree.intersects(3, 7)) {
+//
+// }
 define("markups/IMarkup", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -577,13 +688,14 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
     }());
     exports.default = SlackLike;
 });
-define("example", ["require", "exports", "markups/SlackLike", "lib/debug/TokenizerDebugger"], function (require, exports, SlackLike_1, TokenizerDebugger_1) {
+define("example", ["require", "exports", "markups/SlackLike", "lib/debug/TokenizerDebugger", "lib/debug/NodeDebugger"], function (require, exports, SlackLike_1, TokenizerDebugger_1, NodeDebugger_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var input = document.querySelector("#example-input");
     var type = document.querySelector("#example-type");
     var output = document.querySelector("#output");
     var outputHTML = document.querySelector("#output-html");
+    var outputTree = document.querySelector("#output-tree");
     var tokens = document.querySelector("#tokens");
     var markups = {
         slacklike: new SlackLike_1.default()
@@ -592,18 +704,25 @@ define("example", ["require", "exports", "markups/SlackLike", "lib/debug/Tokeniz
         var exampleType = type.value;
         var exampleValue = input.value;
         var parsed = "";
-        var visualized;
+        var visualizedTokens;
+        var visualizedTree;
         if (markups[exampleType]) {
             var markup = markups[exampleType];
             var tokens_1 = markup.tokenize(exampleValue);
-            visualized = TokenizerDebugger_1.default.toHTMLElement(exampleValue, tokens_1);
-            parsed = markup.parse(tokens_1).expand(exampleValue);
+            var node = markup.parse(tokens_1);
+            visualizedTree = NodeDebugger_1.default.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
+            visualizedTokens = TokenizerDebugger_1.default.toHTMLElement(exampleValue, tokens_1);
+            parsed = node.expand(exampleValue);
         }
         output.innerHTML = parsed;
         outputHTML.innerText = parsed;
-        if (visualized) {
+        if (visualizedTokens) {
             tokens.innerHTML = "";
-            tokens.appendChild(visualized);
+            tokens.appendChild(visualizedTokens);
+        }
+        if (visualizedTree) {
+            outputTree.innerHTML = '';
+            outputTree.appendChild(visualizedTree);
         }
     }
     input.oninput = function () { return handleInput(); };
@@ -611,3 +730,4 @@ define("example", ["require", "exports", "markups/SlackLike", "lib/debug/Tokeniz
     handleInput();
     exports.default = true;
 });
+//# sourceMappingURL=markup-parser.gh-pages.js.map

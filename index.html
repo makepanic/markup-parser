@@ -26,7 +26,7 @@
 
 <div class="container">
   <div class="columns">
-    <div class="column col-4">
+    <div class="column col-12">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Input</div>
@@ -50,7 +50,20 @@
         <div class="panel-footer"></div>
       </div>
     </div>
-    <div class="column col-8">
+
+    <div class="column col-12">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output tree visualized</div>
+        </div>
+        <div class="panel-body">
+          <pre id="output-tree"></pre>
+        </div>
+        <div class="panel-footer"></div>
+      </div>
+    </div>
+
+    <div class="column col-6">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Output HTML (innerHTML)</div>
@@ -60,9 +73,8 @@
         </div>
         <div class="panel-footer"></div>
       </div>
-
-      <div class="divider"></div>
-
+    </div>
+    <div class="column col-6">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Output HTML (innerText)</div>
@@ -72,9 +84,9 @@
         </div>
         <div class="panel-footer"></div>
       </div>
+    </div>
 
-      <div class="divider"></div>
-
+    <div class="column col-12">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Output tokens visualized</div>
@@ -84,11 +96,12 @@
         </div>
         <div class="panel-footer"></div>
       </div>
+
     </div>
   </div>
 </div>
 
-<script src="./require.min.js"></script>
+<script src="./vendor/require.min.js"></script>
 <script src="./markup-parser.gh-pages.js"></script>
 <script>
   (function(){require(['example'])}())
