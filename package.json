@@ -7,7 +7,7 @@
     "pretest": "npm run build-test",
     "test": "nyc --reporter=html ava 'dist/tests/**/*.js'",
     "posttest": "npm run bench",
-    "bench": "node dist/targets/bench.js",
+    "bench": "node dist/targets/bench",
     "build": "tsc",
     "build-test": "tsc -p tsconfig.test.json",
     "build-gh-pages": "tsc -p tsconfig.gh-pages.json",

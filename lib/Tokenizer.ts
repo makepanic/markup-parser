@@ -5,6 +5,21 @@ import TokenKind from "./token/TokenKind";
 declare type MatchRange<T extends number> = [number, number, TokenMatcher<T>];
 type TokenRange<T> = [number, number, T, TokenKind];
 
+function fillArray(array: Array<boolean>, from: number, until: number) {
+  for(let i = from; i < until; i++) {
+    array[i] = true;
+  }
+}
+
+function hasHole(array: Array<boolean>, from: number, until: number) {
+  for(let i = from; i < until; i++) {
+    if (array[i] === true){
+      return false;
+    }
+  }
+  return true;
+}
+
 class Tokenizer<T extends number> {
   private matcher: Array<TokenMatcher<T>>;
   private filler: T;
@@ -25,8 +40,9 @@ class Tokenizer<T extends number> {
 
   tokenize(string: string): Array<Token<T>> {
     let tokens: Array<MatchRange<T>> = [];
-    let matchedRanges: Array<[number, number]> = [];
     const tokensWithText: Array<TokenRange<T>> = [];
+
+    const matchedRangesBuffer: boolean[] = [];
 
     //create list of tokens
     this.matcher.forEach(matcher => {
@@ -38,14 +54,8 @@ class Tokenizer<T extends number> {
         const end = start + match[0].length;
 
         if (string[start - 1] !== this.escaper) {
-          const rangeAlreadyTokenized = matchedRanges.some(
-            ([rangeStart, rangeEnd]) => {
-              return !(end <= rangeStart || start >= rangeEnd);
-            }
-          );
-
-          if (!rangeAlreadyTokenized) {
-            matchedRanges.push([start, end]);
+          if (hasHole(matchedRangesBuffer, start, end)) {
+            fillArray(matchedRangesBuffer, start, end);
             tokens.push([start, end, matcher]);
           }
         }
