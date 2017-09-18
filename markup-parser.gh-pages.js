@@ -331,6 +331,7 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
                 return new Token_1.default(start, end, format, kind);
             });
             allTokens.push(new Token_1.default(string.length, string.length, this.terminator));
+            matchedRangesBuffer = null;
             return allTokens;
         };
         return Tokenizer;
@@ -656,12 +657,14 @@ define("example", ["require", "exports", "markups/SlackLike", "lib/debug/Tokeniz
     var outputHTML = document.querySelector("#output-html");
     var outputTree = document.querySelector("#output-tree");
     var tokens = document.querySelector("#tokens");
+    var visualize = document.querySelector('#visualize-input');
     var markups = {
         slacklike: new SlackLike_1.default()
     };
     function handleInput() {
         var exampleType = type.value;
         var exampleValue = input.value;
+        var shouldVisualize = visualize.checked;
         var parsed = "";
         var visualizedTokens;
         var visualizedTree;
@@ -669,19 +672,23 @@ define("example", ["require", "exports", "markups/SlackLike", "lib/debug/Tokeniz
             var markup = markups[exampleType];
             var tokens_1 = markup.tokenize(exampleValue);
             var node = markup.parse(tokens_1);
-            visualizedTree = NodeDebugger_1.default.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
-            visualizedTokens = TokenizerDebugger_1.default.toHTMLElement(exampleValue, tokens_1);
+            if (shouldVisualize) {
+                visualizedTree = NodeDebugger_1.default.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
+                visualizedTokens = TokenizerDebugger_1.default.toHTMLElement(exampleValue, tokens_1);
+            }
             parsed = node.expand(exampleValue);
         }
-        output.innerHTML = parsed;
-        outputHTML.innerText = parsed;
-        if (visualizedTokens) {
-            tokens.innerHTML = "";
-            tokens.appendChild(visualizedTokens);
-        }
-        if (visualizedTree) {
-            outputTree.innerHTML = '';
-            outputTree.appendChild(visualizedTree);
+        if (shouldVisualize) {
+            output.innerHTML = parsed;
+            outputHTML.innerText = parsed;
+            if (visualizedTokens) {
+                tokens.innerHTML = "";
+                tokens.appendChild(visualizedTokens);
+            }
+            if (visualizedTree) {
+                outputTree.innerHTML = '';
+                outputTree.appendChild(visualizedTree);
+            }
         }
     }
     input.oninput = function () { return handleInput(); };
