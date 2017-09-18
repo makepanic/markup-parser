@@ -11,11 +11,10 @@ var __extends = (this && this.__extends) || (function () {
 define("lib/rule/RuleProperty", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // NOTE: must be bitmask compatible (start at 1)
     var RuleProperty;
     (function (RuleProperty) {
-        RuleProperty[RuleProperty["None"] = 1] = "None";
-        RuleProperty[RuleProperty["Block"] = 2] = "Block";
+        RuleProperty[RuleProperty["None"] = 0] = "None";
+        RuleProperty[RuleProperty["Block"] = 1] = "Block";
     })(RuleProperty || (RuleProperty = {}));
     exports.default = RuleProperty;
 });
@@ -168,7 +167,7 @@ define("lib/Parser", ["require", "exports", "lib/rule/RuleProperty", "lib/Node"]
                     if (token.consumed) {
                         continue;
                     }
-                    if (rule.properties & RuleProperty_1.default.Block) {
+                    if (rule.properties === RuleProperty_1.default.Block) {
                         // block rule
                         var closing = this.peek(rule.close, rule.closesKind, tokens.slice(index + 1));
                         if (closing === undefined) {
@@ -244,6 +243,19 @@ define("lib/token/TokenMatcher", ["require", "exports", "lib/token/TokenKind"], 
 define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/TokenKind"], function (require, exports, Token_1, TokenKind_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    function fillArray(array, from, until) {
+        for (var i = from; i < until; i++) {
+            array[i] = true;
+        }
+    }
+    function hasHole(array, from, until) {
+        for (var i = from; i < until; i++) {
+            if (array[i] === true) {
+                return false;
+            }
+        }
+        return true;
+    }
     var Tokenizer = /** @class */ (function () {
         function Tokenizer(filler, terminator, escaper) {
             if (escaper === void 0) { escaper = "\\"; }
@@ -260,39 +272,21 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
         Tokenizer.prototype.tokenize = function (string) {
             var _this = this;
             var tokens = [];
-            var matchedRanges = [];
             var tokensWithText = [];
+            var matchedRangesBuffer = [];
             //create list of tokens
             this.matcher.forEach(function (matcher) {
                 var match;
-                var _loop_1 = function () {
+                // go through all matchers and try to regex match
+                while ((match = matcher.regex.exec(string)) !== null) {
                     var start = match.index;
                     var end = start + match[0].length;
-                    // TODO: build lookuptable for already matched
-                    /*
-                    {
-                      2: true
-            
-                      [4]: look right, look left, look 2 right, look 2 left, ...
-                      5: true
-                    }
-            
-                    is 4 matched?
-                     */
                     if (string[start - 1] !== _this.escaper) {
-                        var rangeAlreadyTokenized = matchedRanges.some(function (_a) {
-                            var rangeStart = _a[0], rangeEnd = _a[1];
-                            return !(end <= rangeStart || start >= rangeEnd);
-                        });
-                        if (!rangeAlreadyTokenized) {
-                            matchedRanges.push([start, end]);
+                        if (hasHole(matchedRangesBuffer, start, end)) {
+                            fillArray(matchedRangesBuffer, start, end);
                             tokens.push([start, end, matcher]);
                         }
                     }
-                };
-                // go through all matchers and try to regex match
-                while ((match = matcher.regex.exec(string)) !== null) {
-                    _loop_1();
                 }
             });
             var lastEnd = 0;
