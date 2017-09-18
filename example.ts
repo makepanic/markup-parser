@@ -9,6 +9,7 @@ const output = <HTMLDivElement>document.querySelector("#output");
 const outputHTML = <HTMLDivElement>document.querySelector("#output-html");
 const outputTree = <HTMLDivElement>document.querySelector("#output-tree");
 const tokens = <HTMLDivElement>document.querySelector("#tokens");
+const visualize = <HTMLInputElement>document.querySelector('#visualize-input');
 
 const markups: { [name: string]: IMarkup<any> } = {
   slacklike: new SlackLike()
@@ -17,6 +18,7 @@ const markups: { [name: string]: IMarkup<any> } = {
 function handleInput() {
   const exampleType = type.value;
   const exampleValue = input.value;
+  const shouldVisualize = visualize.checked;
   let parsed = "";
   let visualizedTokens;
   let visualizedTree;
@@ -26,23 +28,27 @@ function handleInput() {
     const tokens = markup.tokenize(exampleValue);
     const node = markup.parse(tokens);
 
-    visualizedTree = NodeDebugger.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
-    visualizedTokens = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
+    if (shouldVisualize) {
+      visualizedTree = NodeDebugger.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
+      visualizedTokens = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
+    }
 
     parsed = node.expand(exampleValue);
   }
 
-  output.innerHTML = parsed;
-  outputHTML.innerText = parsed;
+  if (shouldVisualize) {
+    output.innerHTML = parsed;
+    outputHTML.innerText = parsed;
 
-  if (visualizedTokens) {
-    tokens.innerHTML = "";
-    tokens.appendChild(visualizedTokens);
-  }
+    if (visualizedTokens) {
+      tokens.innerHTML = "";
+      tokens.appendChild(visualizedTokens);
+    }
 
-  if (visualizedTree) {
-    outputTree.innerHTML = '';
-    outputTree.appendChild(visualizedTree);
+    if (visualizedTree) {
+      outputTree.innerHTML = '';
+      outputTree.appendChild(visualizedTree);
+    }
   }
 }
 

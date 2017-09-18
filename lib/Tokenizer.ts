@@ -42,7 +42,7 @@ class Tokenizer<T extends number> {
     let tokens: Array<MatchRange<T>> = [];
     const tokensWithText: Array<TokenRange<T>> = [];
 
-    const matchedRangesBuffer: boolean[] = [];
+    let matchedRangesBuffer: boolean[] = [];
 
     //create list of tokens
     this.matcher.forEach(matcher => {
@@ -99,6 +99,8 @@ class Tokenizer<T extends number> {
       );
 
     allTokens.push(new Token<T>(string.length, string.length, this.terminator));
+
+    matchedRangesBuffer = null;
 
     return allTokens;
   }
