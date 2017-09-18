@@ -206,7 +206,14 @@ define("lib/Parser", ["require", "exports", "lib/rule/RuleProperty", "lib/Node"]
                 }
                 if (!token.consumed) {
                     token.consumed = true;
-                    parent.appendChild(this.fallbackNode(token));
+                    var previousChild = parent.children[parent.children.length - 1];
+                    if (previousChild && previousChild.rule === this.fallbackRule) {
+                        // if previous node is fallbackRule, simply extend end to current token end to avoid additional node
+                        previousChild.end = token.end;
+                    }
+                    else {
+                        parent.appendChild(this.fallbackNode(token));
+                    }
                 }
             }
             return parent;
@@ -340,23 +347,24 @@ define("lib/debug/NodeDebugger", ["require", "exports"], function (require, expo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function nest(string, node, parentNode) {
-        var wrapper = document.createElement('div');
-        var content = document.createElement('div');
+        var wrapper = document.createElement("div");
+        var content = document.createElement("div");
         if (!node.parentNode) {
-            wrapper.classList.add('node--root');
+            wrapper.classList.add("node--root");
         }
-        wrapper.classList.add('node');
-        content.className = 'node__content';
+        wrapper.classList.add("node");
+        content.className = "node__content";
         wrapper.appendChild(content);
         if (node.rule) {
-            var opens = document.createElement('div');
-            opens.className = "node__rule node__rule--open node__rule--" + node.rule.open;
+            var opens = document.createElement("div");
+            opens.className = "node__rule node__rule--open node__rule--" + node.rule
+                .open;
             opens.innerText = "" + node.rule.open;
             content.appendChild(opens);
         }
         if (node.children.length) {
-            var children_1 = document.createElement('div');
-            children_1.className = 'node__children';
+            var children_1 = document.createElement("div");
+            children_1.className = "node__children";
             node.children.forEach(function (childNode) {
                 nest(string, childNode, children_1);
             });
@@ -364,14 +372,15 @@ define("lib/debug/NodeDebugger", ["require", "exports"], function (require, expo
         }
         else {
             // create text
-            var text = document.createElement('div');
-            text.className = 'node__text';
+            var text = document.createElement("div");
+            text.className = "node__text";
             text.innerText = string.substring(node.start, node.end);
             content.appendChild(text);
         }
         if (node.rule && node.rule.close >= 0) {
-            var closes = document.createElement('div');
-            closes.className = "node__rule node__rule--open node__rule--" + node.rule.close;
+            var closes = document.createElement("div");
+            closes.className = "node__rule node__rule--open node__rule--" + node.rule
+                .close;
             closes.innerText = "" + node.rule.close;
             content.appendChild(closes);
         }
@@ -385,7 +394,7 @@ define("lib/debug/NodeDebugger", ["require", "exports"], function (require, expo
                 console.warn("toHTMLElement requires document");
                 return;
             }
-            var root = document.createElement('div');
+            var root = document.createElement("div");
             nest(string, node, root);
             return root;
         };
@@ -549,49 +558,6 @@ define("lib/utils/Conditions", ["require", "exports"], function (require, export
         }
     };
 });
-var RangeType;
-(function (RangeType) {
-    RangeType[RangeType["start"] = 0] = "start";
-    RangeType[RangeType["end"] = 1] = "end";
-})(RangeType || (RangeType = {}));
-/*
-
-left smaller
-right bigger
-
-    7
-  3   4
-1 - 2
-
- */
-// class RangeNode {
-//   left: RangeNode;
-//   right: RangeNode;
-//   type: RangeType;
-//   value: number;
-//
-//   insert(number: number, type: RangeType, parent: RangeNode = this) {
-//     if (this.left.value > number) {
-//        this.insert(number, type, this.left);
-//     } else if(this.right.value < number) {
-//       this.insert(number, type, this.right);
-//     }
-//   }
-//
-//   intersects(start: number, end: number) {
-//
-//   }
-// }
-//
-// const tree = new RangeNode();
-// tree.insert(2, RangeType.start);
-// tree.insert(4, RangeType.end);
-// tree.insert(6, RangeType.start);
-// tree.insert(10, RangeType.end);
-//
-// if (tree.intersects(3, 7)) {
-//
-// }
 define("markups/IMarkup", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -647,7 +613,6 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
     var grammar = new Grammar_1.default()
         .add(new ConstantRule_1.default(Type.Newline, "<br>"))
         .add(new ConstantRule_1.default(Type.Escape, ""))
-        .add(new TextRule_1.default(Type.Text, function (text) { return text; }))
         .add(new TextRule_1.default(Type.Url, function (text) {
         return "<a href=\"" + text + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + text + "</a>";
     }))
