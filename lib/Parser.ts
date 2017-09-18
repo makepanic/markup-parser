@@ -64,7 +64,7 @@ class Parser<T extends number> {
           continue;
         }
 
-        if (rule.properties & RuleProperty.Block) {
+        if (rule.properties === RuleProperty.Block) {
           // block rule
           const closing = this.peek(
             rule.close,

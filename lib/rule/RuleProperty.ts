@@ -1,7 +1,6 @@
-// NOTE: must be bitmask compatible (start at 1)
 enum RuleProperty {
-  None = 0b001,
-  Block = 0b010
+  None,
+  Block,
 }
 
 export default RuleProperty;
