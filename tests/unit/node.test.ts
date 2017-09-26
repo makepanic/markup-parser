@@ -4,14 +4,14 @@ import Node from "../../lib/Node";
 import TextRule from "../../lib/rule/TextRule";
 import Rule from "../../lib/rule/Rule";
 
-enum Types {
-  Foo,
-  HereRight,
-  HereLeft,
-  Text
-}
+const Type = {
+  Foo: 0,
+  HereRight: 1,
+  HereLeft: 2,
+  Text: 3
+};
 
-const identityTextRule = new TextRule<Types>(Types.Text, a => a);
+const identityTextRule = new TextRule(Type.Text, a => a);
 
 test("appendChild", function(t) {
   const parentNode = new Node();
@@ -26,51 +26,51 @@ test("appendChild", function(t) {
 
 test("expands TextRule", function(t) {
   {
-    const rootNode = new Node<Types>();
-    rootNode.appendChild(new Node<Types>(identityTextRule, 0, 3));
+    const rootNode = new Node();
+    rootNode.appendChild(new Node(identityTextRule, 0, 3));
     t.is(rootNode.expand("HelloBaz"), "Hel");
   }
 
   {
-    const rootNode = new Node<Types>();
-    rootNode.appendChild(new Node<Types>(identityTextRule, 0, 3));
-    rootNode.appendChild(new Node<Types>(identityTextRule, 3, 8));
+    const rootNode = new Node();
+    rootNode.appendChild(new Node(identityTextRule, 0, 3));
+    rootNode.appendChild(new Node(identityTextRule, 3, 8));
     t.is(rootNode.expand("HelloBaz"), "HelloBaz");
   }
 
   {
-    const rootNode = new Node<Types>();
-    rootNode.appendChild(new Node<Types>(identityTextRule, 0, 3));
-    rootNode.appendChild(new Node<Types>(identityTextRule, 4, 8));
+    const rootNode = new Node();
+    rootNode.appendChild(new Node(identityTextRule, 0, 3));
+    rootNode.appendChild(new Node(identityTextRule, 4, 8));
     t.is(rootNode.expand("HelloBaz"), "HeloBaz");
   }
 });
 
 test("expands text", function(t) {
-  const rootNode = new Node<Types>();
+  const rootNode = new Node();
 
-  rootNode.appendChild(new Node<Types>(identityTextRule, 0, 3));
+  rootNode.appendChild(new Node(identityTextRule, 0, 3));
   rootNode.appendChild(
-    new Node<Types>(
-      new Rule<Types>(Types.Foo, undefined, RuleProperty.None, () => "Foobar"),
+    new Node(
+      new Rule(Type.Foo, undefined, RuleProperty.None, () => "Foobar"),
       3,
       4
     )
   );
-  rootNode.appendChild(new Node<Types>(identityTextRule, 4, 8));
+  rootNode.appendChild(new Node(identityTextRule, 4, 8));
 
   t.is(rootNode.expand("HelloBaz"), "HelFoobaroBaz");
 });
 
 test("expands block rules", function(t) {
-  const rootNode = new Node<Types>();
+  const rootNode = new Node();
 
-  rootNode.appendChild(new Node<Types>(identityTextRule, 0, 10));
+  rootNode.appendChild(new Node(identityTextRule, 0, 10));
   rootNode.appendChild(
-    new Node<Types>(
-      new Rule<Types>(
-        Types.HereLeft,
-        Types.HereRight,
+    new Node(
+      new Rule(
+        Type.HereLeft,
+        Type.HereRight,
         RuleProperty.Block,
         str => `(☞ﾟヮﾟ)☞ ${str} ☜(ﾟヮﾟ☜)`
       ),
@@ -78,7 +78,7 @@ test("expands block rules", function(t) {
       14
     )
   );
-  rootNode.appendChild(new Node<Types>(identityTextRule, 14, 42));
+  rootNode.appendChild(new Node(identityTextRule, 14, 42));
 
   t.is(
     rootNode.expand("I'm sorry Dave, I'm afraid I can't do that"),
@@ -87,11 +87,11 @@ test("expands block rules", function(t) {
 });
 
 test("expands nested nodes", function(t) {
-  const rootNode = new Node<Types>();
-  const childNode = new Node<Types>(
-    new Rule<Types>(
-      Types.HereLeft,
-      Types.HereRight,
+  const rootNode = new Node();
+  const childNode = new Node(
+    new Rule(
+      Type.HereLeft,
+      Type.HereRight,
       RuleProperty.Block,
       str => `(☞ﾟヮﾟ)☞ ${str} ☜(ﾟヮﾟ☜)`
     ),
@@ -99,10 +99,10 @@ test("expands nested nodes", function(t) {
     14
   );
 
-  rootNode.appendChild(new Node<Types>(identityTextRule, 0, 10));
+  rootNode.appendChild(new Node(identityTextRule, 0, 10));
   rootNode.appendChild(childNode);
-  childNode.appendChild(new Node<Types>(identityTextRule, 10, 14));
-  rootNode.appendChild(new Node<Types>(identityTextRule, 14, 42));
+  childNode.appendChild(new Node(identityTextRule, 10, 14));
+  rootNode.appendChild(new Node(identityTextRule, 14, 42));
 
   t.is(
     rootNode.expand("I'm sorry Dave, I'm afraid I can't do that"),
@@ -111,6 +111,6 @@ test("expands nested nodes", function(t) {
 });
 
 test("expand always returns a string even without rule", t => {
-  const node = new Node<Types>();
+  const node = new Node();
   t.is(node.expand("foo"), "");
 });

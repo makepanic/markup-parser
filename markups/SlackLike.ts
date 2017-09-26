@@ -20,24 +20,23 @@ import {
 import IMarkup from "./IMarkup";
 import Token from "../lib/token/Token";
 
-export enum Type {
-  Nul,
-  Newline,
-  Quote,
-  Escape,
-  Url,
-  PseudoUrl,
-  Email,
-  Preformatted,
-  Text,
+export const Type = {
+  Nul: 0,
+  Newline: 1,
+  Quote: 2,
+  Escape: 3,
+  Url: 4,
+  PseudoUrl: 5,
+  Email: 6,
+  Preformatted: 7,
+  Text: 8,
+  Bold: 9,
+  Italics: 10,
+  Strike: 11,
+  Code: 12
+};
 
-  Bold,
-  Italics,
-  Strike,
-  Code
-}
-
-const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
+const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   .add(new TokenMatcher(/(\n)/g, Type.Newline))
   .add(
     new TokenMatcher(/(>)/g, Type.Quote, [
@@ -91,7 +90,7 @@ const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul)
     ])
   );
 
-const grammar = new Grammar<Type>()
+const grammar = new Grammar()
   .add(new ConstantRule(Type.Newline, "<br>"))
   .add(new ConstantRule(Type.Escape, ""))
   .add(
@@ -185,14 +184,14 @@ const grammar = new Grammar<Type>()
 
 const parser = new Parser(grammar, new TextRule(Type.Text, text => text));
 
-class SlackLike implements IMarkup<Type> {
+class SlackLike implements IMarkup {
   types = Type;
 
-  tokenize(input: string): Token<Type>[] {
+  tokenize(input: string): Token[] {
     return tokenizer.tokenize(input);
   }
 
-  parse(tokens: Token<Type>[]): Node<Type> {
+  parse(tokens: Token[]): Node {
     return parser.parse(tokens);
   }
 

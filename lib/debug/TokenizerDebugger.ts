@@ -2,9 +2,9 @@ import Token from "../token/Token";
 import TokenKind from "../token/TokenKind";
 
 class TokenizerDebugger {
-  static toHTMLElement<T extends number>(
+  static toHTMLElement(
     text: string,
-    tokens: Array<Token<T>>
+    tokens: Array<Token>
   ): HTMLElement | undefined {
     if (typeof document === "undefined") {
       console.warn("toHTMLElement requires document");

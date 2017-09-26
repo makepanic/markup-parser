@@ -8,20 +8,20 @@ import TokenMatcher from "../../lib/token/TokenMatcher";
 import Token from "../../lib/token/Token";
 import TokenKind from "../../lib/token/TokenKind";
 
-enum Type {
-  Nul,
-  Text,
-  Block,
-  A,
-  B,
-  C
-}
+const Type = {
+  Nul: 0,
+  Text: 1,
+  Block: 2,
+  A: 3,
+  B: 4,
+  C: 5
+};
 
-const tokenizer = new Tokenizer<Type>(Type.Text, Type.Nul).add(
+const tokenizer = new Tokenizer(Type.Text, Type.Nul).add(
   new TokenMatcher(/B/g, Type.Block)
 );
 
-const grammar = new Grammar<Type>()
+const grammar = new Grammar()
   .add(new TextRule(Type.Text, t => `${t}`))
   .add(new BlockRule(Type.Block, Type.Block, children => `[B]${children}[/B]`));
 
@@ -40,7 +40,7 @@ test("it works", t => {
 test("peek is bitmask aware", t => {
   const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
-  const tokens: Array<Token<Type>> = [
+  const tokens: Array<Token> = [
     new Token(0, 1, Type.A, TokenKind.Default | TokenKind.Closes),
     new Token(
       3,

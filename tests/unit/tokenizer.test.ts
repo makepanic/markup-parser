@@ -3,15 +3,15 @@ import Tokenizer from "../../lib/Tokenizer";
 import TokenMatcher from "../../lib/token/TokenMatcher";
 import TokenKind from "../../lib/token/TokenKind";
 
-enum Type {
-  EOL,
-  Text,
-  Newline,
-  A
-}
+const Type = {
+  EOL: 0,
+  Text: 1,
+  Newline: 2,
+  A: 3
+};
 
 test("tokenize", function(t) {
-  const tokenizer = new Tokenizer<Type>(Type.Text, Type.EOL)
+  const tokenizer = new Tokenizer(Type.Text, Type.EOL)
     .add(new TokenMatcher(/(\n)/g, Type.Newline))
     .add(new TokenMatcher(/A/g, Type.A));
 
@@ -27,7 +27,7 @@ test("tokenize", function(t) {
 });
 
 test("tokenize empty string", function(t) {
-  const tokenizer = new Tokenizer<Type>(Type.Text, Type.EOL)
+  const tokenizer = new Tokenizer(Type.Text, Type.EOL)
     .add(new TokenMatcher(/(\n)/g, Type.Newline))
     .add(new TokenMatcher(/A/g, Type.A));
 
@@ -36,7 +36,7 @@ test("tokenize empty string", function(t) {
 });
 
 test("uses constraint function", function(t) {
-  const tokenizerA = new Tokenizer<Type>(Type.Text, Type.EOL).add(
+  const tokenizerA = new Tokenizer(Type.Text, Type.EOL).add(
     new TokenMatcher(/A/g, Type.A, [
       [
         (string, start) => string.substring(start, start + 1) === "A",
@@ -45,7 +45,7 @@ test("uses constraint function", function(t) {
     ])
   );
 
-  const tokenizerB = new Tokenizer<Type>(Type.Text, Type.EOL).add(
+  const tokenizerB = new Tokenizer(Type.Text, Type.EOL).add(
     new TokenMatcher(/A/g, Type.A, [
       [
         (string, start) => string.substring(start, start + 1) === "B",

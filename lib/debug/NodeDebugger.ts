@@ -1,10 +1,6 @@
 import Node from "../Node";
 
-function nest<T extends number>(
-  string: string,
-  node: Node<T>,
-  parentNode: HTMLElement
-) {
+function nest(string: string, node: Node, parentNode: HTMLElement) {
   const wrapper = document.createElement("div");
   const content = document.createElement("div");
 
@@ -53,7 +49,7 @@ function nest<T extends number>(
 class NodeDebugger {
   static toHTMLElement<T extends number>(
     string: string,
-    node: Node<T>,
+    node: Node,
     width: number,
     height: number
   ): HTMLElement | undefined {

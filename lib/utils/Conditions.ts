@@ -38,7 +38,7 @@ export const otherTokenBefore = (
   start: number,
   end: number,
   index: number,
-  tokens: Array<[number, number, TokenMatcher<number>]>
+  tokens: Array<[number, number, TokenMatcher]>
 ) => {
   if (index - 1 >= 0) {
     const [, tEnd, prevMatcher] = tokens[index - 1];
@@ -58,7 +58,7 @@ export const otherTokenAfter = (
   start: number,
   end: number,
   index: number,
-  tokens: Array<[number, number, TokenMatcher<number>]>
+  tokens: Array<[number, number, TokenMatcher]>
 ) => {
   if (index + 1 < tokens.length) {
     const [tStart, , nextMatcher] = tokens[index + 1];

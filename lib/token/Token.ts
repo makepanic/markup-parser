@@ -1,17 +1,17 @@
 import TokenKind from "./TokenKind";
 
-class Token<T extends number> {
+class Token {
   readonly start: number;
   readonly end: number;
   readonly kind: TokenKind;
 
-  id: T;
+  id: number;
   consumed: boolean = false;
 
   constructor(
     start: number,
     end: number,
-    id: T,
+    id: number,
     kind: TokenKind = TokenKind.Default
   ) {
     this.start = start;

@@ -5,18 +5,18 @@ export interface DisplayFunction {
   (string: string): string;
 }
 
-class Rule<T extends number> {
-  readonly open: T;
+class Rule {
+  readonly open: number;
   readonly openKind: TokenKind;
-  readonly close: T;
+  readonly close: number;
   readonly closesKind: TokenKind;
   readonly display: DisplayFunction;
   readonly properties: RuleProperty;
   readonly occludes: boolean = false;
 
   constructor(
-    open: T,
-    close: T,
+    open: number,
+    close: number,
     properties: RuleProperty,
     display: DisplayFunction,
     openKind = TokenKind.Default,

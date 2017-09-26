@@ -11,7 +11,7 @@ const outputTree = <HTMLDivElement>document.querySelector("#output-tree");
 const tokens = <HTMLDivElement>document.querySelector("#tokens");
 const visualize = <HTMLInputElement>document.querySelector('#visualize-input');
 
-const markups: { [name: string]: IMarkup<any> } = {
+const markups: { [name: string]: IMarkup } = {
   slacklike: new SlackLike()
 };
 

@@ -2,26 +2,30 @@ import TokenMatcher from "./token/TokenMatcher";
 import Token from "./token/Token";
 import TokenKind from "./token/TokenKind";
 
-declare type MatchRange<T extends number> = [number, number, TokenMatcher<T>];
-type TokenRange<T> = [number, number, T, TokenKind];
+declare type MatchRange = [number, number, TokenMatcher];
+type TokenRange = [number, number, number, TokenKind];
 
 function fillArray(array: Array<boolean>, from: number, until: number) {
-  for(let i = from; i < until; i++) {
+  for (let i = from; i < until; i++) {
     array[i] = true;
   }
 }
 
 function hasHole(array: Array<boolean>, from: number, until: number) {
-  for(let i = from; i < until; i++) {
-    if (array[i] === true){
+  for (let i = from; i < until; i++) {
+    if (array[i] === true) {
       return false;
     }
   }
   return true;
 }
 
+/**
+ * Class that has the job to turn a given string into a list of tokens.
+ * @class
+ */
 class Tokenizer<T extends number> {
-  private matcher: Array<TokenMatcher<T>>;
+  private matcher: Array<TokenMatcher>;
   private filler: T;
   private escaper: string = "\\";
   private terminator: T;
@@ -33,14 +37,20 @@ class Tokenizer<T extends number> {
     this.escaper = escaper;
   }
 
-  add(tokenMatcher: TokenMatcher<T>) {
+  add(tokenMatcher: TokenMatcher) {
     this.matcher.push(tokenMatcher);
     return this;
   }
 
-  tokenize(string: string): Array<Token<T>> {
-    let tokens: Array<MatchRange<T>> = [];
-    const tokensWithText: Array<TokenRange<T>> = [];
+  /**
+   * Method to extract a list of tokens from a given string.
+   * This happens by matching each tokenizer matching against the string.
+   * @param {string} string
+   * @return {Array<Token<T extends number>>}
+   */
+  tokenize(string: string): Array<Token> {
+    let tokens: Array<MatchRange> = [];
+    const tokensWithText: Array<TokenRange> = [];
 
     let matchedRangesBuffer: boolean[] = [];
 
@@ -78,7 +88,7 @@ class Tokenizer<T extends number> {
             TokenKind.Default
           );
           // [n, m, Bold, Closes]
-          let token: TokenRange<T> = [start, end, matcher.id, mergedKinds];
+          let token: TokenRange = [start, end, matcher.id, mergedKinds];
           tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
           tokensWithText.push(token);
           lastEnd = end;
@@ -94,11 +104,9 @@ class Tokenizer<T extends number> {
 
     const allTokens = tokensWithText
       .filter(([start, end]) => start < end)
-      .map(
-        ([start, end, format, kind]) => new Token<T>(start, end, format, kind)
-      );
+      .map(([start, end, format, kind]) => new Token(start, end, format, kind));
 
-    allTokens.push(new Token<T>(string.length, string.length, this.terminator));
+    allTokens.push(new Token(string.length, string.length, this.terminator));
 
     matchedRangesBuffer = null;
 

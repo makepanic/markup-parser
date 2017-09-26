@@ -5,10 +5,10 @@ import TokenKind from "../token/TokenKind";
 /**
  * Rule that wraps its children
  */
-class BlockRule<T extends number> extends Rule<T> {
+class BlockRule extends Rule {
   constructor(
-    open: T,
-    close: T,
+    open: number,
+    close: number,
     display: (text: string) => string,
     kindOpen = TokenKind.Default,
     kindClosed = TokenKind.Default,

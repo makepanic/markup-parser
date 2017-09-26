@@ -2,14 +2,14 @@ import TokenKind from "./TokenKind";
 import { KindConstraint } from "./TokenKindConstraint";
 const returnTrue = () => true;
 
-class TokenMatcher<T extends number> {
+class TokenMatcher {
   readonly regex: RegExp;
-  readonly id: T;
+  readonly id: number;
   readonly constraints: Array<KindConstraint>;
 
   constructor(
     regex: RegExp,
-    id: T,
+    id: number,
     constraints: Array<KindConstraint> = [[returnTrue, TokenKind.Default]]
   ) {
     this.regex = regex;

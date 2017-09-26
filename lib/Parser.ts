@@ -5,25 +5,32 @@ import Rule from "./rule/Rule";
 import Token from "./token/Token";
 import TokenKind from "./token/TokenKind";
 
-export interface PeekResult<T extends number> {
+export interface PeekResult {
   idx: number;
-  token: Token<T>;
+  token: Token;
 }
 
-class Parser<T extends number> {
-  private grammar: Grammar<T>;
-  private fallbackRule: Rule<T>;
+class Parser {
+  private grammar: Grammar;
+  private fallbackRule: Rule;
 
-  constructor(grammar: Grammar<T>, fallbackRule: Rule<T>) {
+  constructor(grammar: Grammar, fallbackRule: Rule) {
     this.grammar = grammar;
     this.fallbackRule = fallbackRule;
   }
 
+  /**
+   * Find a token that matches type and kind in a given list of tokens
+   * @param {T} type
+   * @param {TokenKind} tokenKind
+   * @param {Array<Token<T extends number>>} tokens
+   * @return {PeekResult<T extends number>}
+   */
   peek(
-    type: T,
+    type: number,
     tokenKind: TokenKind,
-    tokens: Array<Token<T>>
-  ): PeekResult<T> | undefined {
+    tokens: Array<Token>
+  ): PeekResult | undefined {
     let idx = -1;
     let token;
 
@@ -39,16 +46,32 @@ class Parser<T extends number> {
     return idx !== -1 ? { idx, token } : undefined;
   }
 
-  openRules(token: Token<T>): Array<Rule<T>> {
+  /**
+   * Method that returns all opening rules for a given token.
+   * @param {Token<T extends number>} token
+   * @return {Array<Rule<T extends number>>}
+   */
+  openRules(token: Token): Array<Rule> {
     return (this.grammar.ruleOpenLookup[+token.id] || [])
       .filter(rule => rule.openKind & token.kind);
   }
 
-  fallbackNode(token: Token<T>) {
-    return new Node<T>(this.fallbackRule, token.start, token.end);
+  /**
+   * Method that creates a node, using the fallbackRule, based on a given token.
+   * @param {Token<T extends number>} token
+   * @return {Node<T extends number>}
+   */
+  fallbackNode(token: Token) {
+    return new Node(this.fallbackRule, token.start, token.end);
   }
 
-  parse(tokens: Array<Token<T>>, parent = new Node<T>()): Node<T> {
+  /**
+   * Method that builds a tree out of a list of tokens.
+   * @param {Array<Token<T extends number>>} tokens
+   * @param {Node<T extends number>} parent
+   * @return {Node<T extends number>}
+   */
+  parse(tokens: Array<Token>, parent = new Node()): Node {
     for (let index = 0; index < tokens.length; index++) {
       let token = tokens[index];
       if (token.consumed) {
@@ -83,7 +106,7 @@ class Parser<T extends number> {
             // create node from token start to closing end
             token.consumed = true;
             closing.token.consumed = true;
-            const node = new Node<T>(rule, token.start, closing.token.end);
+            const node = new Node(rule, token.start, closing.token.end);
 
             if (rule.occludes) {
               // occluded tokens create a fallback rule in range
@@ -92,7 +115,7 @@ class Parser<T extends number> {
                 .forEach(token => (token.consumed = true));
 
               node.appendChild(
-                new Node<T>(this.fallbackRule, token.end, closing.token.start)
+                new Node(this.fallbackRule, token.end, closing.token.start)
               );
             } else {
               this.parse(
@@ -106,7 +129,7 @@ class Parser<T extends number> {
         } else {
           // is tagRule
           token.consumed = true;
-          const node = new Node<T>(rule, token.start, token.end);
+          const node = new Node(rule, token.start, token.end);
           parent.appendChild(node);
         }
       }
