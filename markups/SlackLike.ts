@@ -14,7 +14,6 @@ import {
   or,
   otherTokenAfter,
   otherTokenBefore,
-  whitespaceBefore,
   whitespaceBeforeOrAfter
 } from "../lib/utils/Conditions";
 import IMarkup from "./IMarkup";
@@ -37,13 +36,13 @@ export const Type = {
 };
 
 const tokenizer = new Tokenizer(Type.Text, Type.Nul)
-  .add(new TokenMatcher(/(\n)/g, Type.Newline))
+  .add(new TokenMatcher(/\n/g, Type.Newline))
   .add(
-    new TokenMatcher(/(>)/g, Type.Quote, [
-      [whitespaceBefore, TokenKind.Default]
+    new TokenMatcher(/>/g, Type.Quote, [
+      [opens, TokenKind.Default]
     ])
   )
-  .add(new TokenMatcher(/(\\)/g, Type.Escape))
+  .add(new TokenMatcher(/\\/g, Type.Escape))
   .add(
     new TokenMatcher(
       /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi,
@@ -61,30 +60,30 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
     )
   )
   .add(
-    new TokenMatcher(/(\*)/g, Type.Bold, [
+    new TokenMatcher(/\*/g, Type.Bold, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
       [or(closes, otherTokenAfter), TokenKind.Closes]
     ])
   )
   .add(
-    new TokenMatcher(/(_)/g, Type.Italics, [
+    new TokenMatcher(/_/g, Type.Italics, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
       [or(closes, otherTokenAfter), TokenKind.Closes]
     ])
   )
   .add(
-    new TokenMatcher(/(~)/g, Type.Strike, [
+    new TokenMatcher(/~/g, Type.Strike, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
       [or(closes, otherTokenAfter), TokenKind.Closes]
     ])
   )
   .add(
-    new TokenMatcher(/(```)/g, Type.Preformatted, [
+    new TokenMatcher(/```/g, Type.Preformatted, [
       [and(whitespaceBeforeOrAfter), TokenKind.Default]
     ])
   )
   .add(
-    new TokenMatcher(/(`)/g, Type.Code, [
+    new TokenMatcher(/`/g, Type.Code, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
       [or(closes, otherTokenAfter), TokenKind.Closes]
     ])
