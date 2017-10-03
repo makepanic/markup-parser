@@ -29,15 +29,16 @@ class Parser {
   peek(
     type: number,
     tokenKind: TokenKind,
-    tokens: Array<Token>
+    tokens: Array<Token>,
+    from: number
   ): PeekResult | undefined {
     let idx = -1;
     let token;
 
-    for (let i = 0; i < tokens.length; i++) {
+    for (let i = from; i < tokens.length; i++) {
       const { id, kind } = tokens[i];
       if (type === id && (kind === tokenKind || kind & tokenKind)) {
-        idx = i;
+        idx = i - from;
         token = tokens[i];
         break;
       }
@@ -92,7 +93,8 @@ class Parser {
           const closing = this.peek(
             rule.close,
             rule.closesKind,
-            tokens.slice(index + 1)
+            tokens,
+            index + 1
           );
 
           if (closing === undefined) {
