@@ -16,7 +16,7 @@ function nest(string: string, node: Node, parentNode: HTMLElement) {
     const opens = document.createElement("div");
     opens.className = `node__rule node__rule--open node__rule--${node.rule
       .open}`;
-    opens.innerText = `${node.rule.open}`;
+    opens.innerText = `${node.start}..`;
     content.appendChild(opens);
   }
 
@@ -39,7 +39,7 @@ function nest(string: string, node: Node, parentNode: HTMLElement) {
     const closes = document.createElement("div");
     closes.className = `node__rule node__rule--open node__rule--${node.rule
       .close}`;
-    closes.innerText = `${node.rule.close}`;
+    closes.innerText = `..${node.end}`;
     content.appendChild(closes);
   }
 

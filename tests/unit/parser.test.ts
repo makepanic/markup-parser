@@ -50,13 +50,13 @@ test("peek is bitmask aware", t => {
     )
   ];
 
-  t.deepEqual(parser.peek(Type.B, TokenKind.Closes, tokens, 0), {
+  t.deepEqual(parser.peek(Type.B, TokenKind.Closes, tokens, 0, tokens.length), {
     idx: 1,
     token: tokens[1]
   });
-  t.deepEqual(parser.peek(Type.B, TokenKind.Opens, tokens, 0), {
+  t.deepEqual(parser.peek(Type.B, TokenKind.Opens, tokens, 0, tokens.length), {
     idx: 1,
     token: tokens[1]
   });
-  t.is(parser.peek(Type.A, TokenKind.Opens, tokens, 0), undefined);
+  t.is(parser.peek(Type.A, TokenKind.Opens, tokens, 0, tokens.length), undefined);
 });

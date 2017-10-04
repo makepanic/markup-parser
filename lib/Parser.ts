@@ -30,12 +30,13 @@ class Parser {
     type: number,
     tokenKind: TokenKind,
     tokens: Array<Token>,
-    from: number
+    from: number,
+    until: number
   ): PeekResult | undefined {
     let idx = -1;
     let token;
 
-    for (let i = from; i < tokens.length; i++) {
+    for (let i = from; i < until; i++) {
       const { id, kind } = tokens[i];
       if (type === id && (kind === tokenKind || kind & tokenKind)) {
         idx = i - from;
@@ -72,8 +73,8 @@ class Parser {
    * @param {Node<T extends number>} parent
    * @return {Node<T extends number>}
    */
-  parse(tokens: Array<Token>, parent = new Node()): Node {
-    for (let index = 0; index < tokens.length; index++) {
+  parse(tokens: Array<Token>, from: number = 0, until: number = tokens.length, parent = new Node()): Node {
+    for (let index = from; index < until; index++) {
       let token = tokens[index];
       if (token.consumed) {
         continue;
@@ -94,7 +95,8 @@ class Parser {
             rule.close,
             rule.closesKind,
             tokens,
-            index + 1
+            index + 1,
+            until
           );
 
           if (closing === undefined) {
@@ -121,7 +123,9 @@ class Parser {
               );
             } else {
               this.parse(
-                tokens.slice(index + 1, index + 1 + closing.idx),
+                tokens,
+                index + 1,
+                index + 1 + closing.idx,
                 node
               );
             }
