@@ -3,10 +3,7 @@ import test from "ava";
 import SlackLike from "../../../markups/SlackLike";
 
 const expectations = [
-  [
-    '> foo',
-    '<blockquote> foo</blockquote>'
-  ],
+  ["> foo", "<blockquote> foo</blockquote>"],
   [
     "https://bbla.com/_hey_.pdf",
     '<a href="https://bbla.com/_hey_.pdf" target="_blank" rel="noopener noreferrer">https://bbla.com/_hey_.pdf</a>'

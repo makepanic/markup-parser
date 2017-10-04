@@ -54,8 +54,9 @@ class Parser {
    * @return {Array<Rule<T extends number>>}
    */
   openRules(token: Token): Array<Rule> {
-    return (this.grammar.ruleOpenLookup[+token.id] || [])
-      .filter(rule => rule.openKind & token.kind);
+    return (this.grammar.ruleOpenLookup[+token.id] || []).filter(
+      rule => rule.openKind & token.kind
+    );
   }
 
   /**
@@ -73,7 +74,12 @@ class Parser {
    * @param {Node<T extends number>} parent
    * @return {Node<T extends number>}
    */
-  parse(tokens: Array<Token>, from: number = 0, until: number = tokens.length, parent = new Node()): Node {
+  parse(
+    tokens: Array<Token>,
+    from: number = 0,
+    until: number = tokens.length,
+    parent = new Node()
+  ): Node {
     for (let index = from; index < until; index++) {
       let token = tokens[index];
       if (token.consumed) {
@@ -122,12 +128,7 @@ class Parser {
                 new Node(this.fallbackRule, token.end, closing.token.start)
               );
             } else {
-              this.parse(
-                tokens,
-                index + 1,
-                index + 1 + closing.idx,
-                node
-              );
+              this.parse(tokens, index + 1, index + 1 + closing.idx, node);
             }
 
             parent.appendChild(node);

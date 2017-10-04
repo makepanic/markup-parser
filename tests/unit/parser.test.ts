@@ -58,5 +58,8 @@ test("peek is bitmask aware", t => {
     idx: 1,
     token: tokens[1]
   });
-  t.is(parser.peek(Type.A, TokenKind.Opens, tokens, 0, tokens.length), undefined);
+  t.is(
+    parser.peek(Type.A, TokenKind.Opens, tokens, 0, tokens.length),
+    undefined
+  );
 });

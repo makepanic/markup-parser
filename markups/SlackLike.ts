@@ -37,11 +37,7 @@ export const Type = {
 
 const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   .add(new TokenMatcher(/\n/g, Type.Newline))
-  .add(
-    new TokenMatcher(/>/g, Type.Quote, [
-      [opens, TokenKind.Default]
-    ])
-  )
+  .add(new TokenMatcher(/>/g, Type.Quote, [[opens, TokenKind.Default]]))
   .add(new TokenMatcher(/\\/g, Type.Escape))
   .add(
     new TokenMatcher(

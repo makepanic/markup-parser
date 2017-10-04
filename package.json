@@ -22,11 +22,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/benchmark": "^1.0.30",
-    "ava": "^0.21.0",
+    "ava": "^0.22.0",
     "benchmark": "^2.1.4",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
-    "prettier": "^1.6.1",
+    "prettier": "^1.7.4",
     "spectre.css": "^0.2.14",
     "surku": "^0.1.14",
     "typedoc": "^0.8.0",
