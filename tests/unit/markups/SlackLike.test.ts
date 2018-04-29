@@ -133,7 +133,43 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
     "test from phone_1 w rt,_ *yay* ~€~",
     "test from phone_1 w rt,_ <strong>yay</strong> <strike>€</strike>"
   ],
-  ["… <em>test</em> …", "… <em>test</em> …"]
+  ["… <em>test</em> …", "… <em>test</em> …"],
+  ["hi peter.jpg wat", "hi peter.jpg wat"],
+  [
+    "hi peter.jp wat",
+    'hi <a href="http://peter.jp" target="_blank" rel="noopener noreferrer">peter.jp</a> wat'
+  ],
+  ["x -> x + 2", "x -> x + 2"],
+  [
+    "btw regarding the user type refactoring (`ANONYM` -> `CUSTOMER`) ... what about naming the 'system' user not `SYSTEM` but `BOT`? that's what those users actually are?",
+    "btw regarding the user type refactoring (<code>ANONYM</code> -> <code>CUSTOMER</code>) ... what about naming the 'system' user not <code>SYSTEM</code> but <code>BOT</code>? that's what those users actually are?"
+  ],
+  ["test >1) bla", "test >1) bla"],
+  [
+    "there's a test in `EventsTest`: `fooBar()` which is run as admin",
+    "there's a test in <code>EventsTest</code>: <code>fooBar()</code> which is run as admin"
+  ],
+  ["2 > 1", "2 > 1"],
+  [
+    "Do you want to know the truth?\n3 > 4\nfight me irl",
+    "Do you want to know the truth?<br>3 > 4<br>fight me irl"
+  ],
+  [
+    "* `upsert` is prone...\n* `getByCreator` ...",
+    "* <code>upsert</code> is prone...<br>* <code>getByCreator</code> ..."
+  ],
+  [
+    "_ `upsert` is prone...\n_ `getByCreator` ...",
+    "_ <code>upsert</code> is prone...<br>_ <code>getByCreator</code> ..."
+  ],
+  [
+    "~ `upsert` is prone...\n~ `getByCreator` ...",
+    "~ <code>upsert</code> is prone...<br>~ <code>getByCreator</code> ..."
+  ],
+  [
+    "` _upsert_ is prone...\n` _getByCreator_ ...",
+    "` <i>upsert</i> is prone...<br>` <i>getByCreator</i> ..."
+  ]
 ];
 
 const markup = new SlackLike();

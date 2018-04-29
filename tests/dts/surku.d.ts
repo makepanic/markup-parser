@@ -1,5 +1,6 @@
 declare module "surku" {
-  export = class {
+  class Surku {
     generateTestCase(sample: string): string;
-  };
+  }
+  export = Surku;
 }

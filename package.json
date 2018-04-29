@@ -21,19 +21,21 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/benchmark": "^1.0.30",
+    "@types/benchmark": "^1.0.31",
     "ava": "^0.22.0",
     "benchmark": "^2.1.4",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
-    "prettier": "^1.7.4",
+    "prettier": "^1.12.1",
     "spectre.css": "^0.2.14",
     "surku": "^0.1.14",
     "typedoc": "^0.8.0",
-    "typescript": "^2.4.2"
+    "typescript": "^2.8.3"
   },
-  "dependencies": {},
   "prettier": {
     "parser": "typescript"
+  },
+  "resolutions": {
+    "@types/lodash": "^4.14.108"
   }
 }
