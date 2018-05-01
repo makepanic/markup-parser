@@ -1,24 +1,24 @@
 import TokenKind from "./TokenKind";
 
-class Token {
-  readonly start: number;
-  readonly end: number;
-  readonly kind: TokenKind;
+interface Token {
+  start: number;
+  end: number;
+  kind: TokenKind;
 
   id: number;
-  consumed: boolean = false;
+  consumed?: boolean;
 
-  constructor(
-    start: number,
-    end: number,
-    id: number,
-    kind: TokenKind = TokenKind.Default
-  ) {
-    this.start = start;
-    this.end = end;
-    this.id = id;
-    this.kind = kind;
-  }
+  // constructor(
+  //   start: number,
+  //   end: number,
+  //   id: number,
+  //   kind: TokenKind = TokenKind.Default
+  // ) {
+  //   this.start = start;
+  //   this.end = end;
+  //   this.id = id;
+  //   this.kind = kind;
+  // }
 }
 
 export default Token;

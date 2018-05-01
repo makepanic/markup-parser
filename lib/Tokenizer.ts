@@ -49,12 +49,12 @@ class Tokenizer<T extends number> {
    * @return {Array<Token<T extends number>>}
    */
   tokenize(string: string): Array<Token> {
-    let tokens: Array<MatchRange> = [];
+    let tokens: MatchRange[] = [];
     const tokensWithText: Array<TokenRange> = [];
 
     let matchedRangesBuffer: boolean[] = [];
 
-    //create list of tokens
+    //create list of matched token matchers
     this.matcher.forEach(matcher => {
       let match;
 
@@ -66,7 +66,7 @@ class Tokenizer<T extends number> {
         if (string[start - 1] !== this.escaper) {
           if (hasHole(matchedRangesBuffer, start, end)) {
             fillArray(matchedRangesBuffer, start, end);
-            tokens.push([start, end, matcher]);
+            tokens[start] = [start, end, matcher];
           }
         }
       }
@@ -75,11 +75,13 @@ class Tokenizer<T extends number> {
     let lastEnd = 0;
 
     tokens
-      .sort(([startA], [startB]) => startA - startB)
-      .forEach(([start, end, matcher], index, tokens) => {
+      .forEach(([start, end, matcher], idx, tokens) => {
+        const prevToken = tokens[idx - 1];
+        const token = tokens[idx];
+        const nextToken = tokens[idx + 1];
         // find matching constraint
         const matchingConstraints = matcher.constraints.filter(([constraint]) =>
-          constraint(string, start, end, index, tokens)
+          constraint(string, start, end, prevToken, token, nextToken)
         );
 
         if (matchingConstraints.length) {
@@ -89,8 +91,10 @@ class Tokenizer<T extends number> {
           );
           // [n, m, Bold, Closes]
           let token: TokenRange = [start, end, matcher.id, mergedKinds];
-          tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
-          tokensWithText.push(token);
+          tokensWithText.push(
+            [lastEnd, start, this.filler, TokenKind.Default],
+            token
+          );
           lastEnd = end;
         }
       });
@@ -104,9 +108,19 @@ class Tokenizer<T extends number> {
 
     const allTokens = tokensWithText
       .filter(([start, end]) => start < end)
-      .map(([start, end, format, kind]) => new Token(start, end, format, kind));
+      .map(([start, end, format, kind]) => ({
+        start,
+        end,
+        id: format,
+        kind,
+      }));
 
-    allTokens.push(new Token(string.length, string.length, this.terminator));
+    allTokens.push({
+      start: string.length,
+      end: string.length,
+      id: this.terminator,
+      kind: TokenKind.Default,
+    });
 
     matchedRangesBuffer = null;
 

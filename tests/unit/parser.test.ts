@@ -41,13 +41,8 @@ test("peek is bitmask aware", t => {
   const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
   const tokens: Array<Token> = [
-    new Token(0, 1, Type.A, TokenKind.Default | TokenKind.Closes),
-    new Token(
-      3,
-      4,
-      Type.B,
-      TokenKind.Default | TokenKind.Closes | TokenKind.Opens
-    )
+    {start: 0, end: 1, id: Type.A, kind: TokenKind.Default | TokenKind.Closes},
+    {start: 3, end: 4, id: Type.B, kind: TokenKind.Default | TokenKind.Closes | TokenKind.Opens}
   ];
 
   t.deepEqual(parser.peek(Type.B, TokenKind.Closes, tokens, 0, tokens.length), {

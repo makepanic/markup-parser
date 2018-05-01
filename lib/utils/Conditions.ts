@@ -3,7 +3,14 @@ import TokenMatcher from "../token/TokenMatcher";
 const WHITEPSPACE_DELIMITER = /[\n :.,+&?!/()]/;
 const SPACE_OR_NEWLINE_BEFORE = /^[ \n]+$/;
 
-export type condition = (str: string, start: number, end?: number) => boolean;
+export type condition = (
+  str: string,
+  start: number,
+  end?: number,
+  prevToken?: [number, number, TokenMatcher] | undefined,
+  token?: [number, number, TokenMatcher],
+  nextToken?: [number, number, TokenMatcher] | undefined,
+) => boolean;
 
 export const and = (...fns: any[]) => (...args: any[]) =>
   fns.every(fn => fn(...args));
@@ -12,20 +19,14 @@ export const or = (...fns: any[]) => (...args: any[]) =>
 
 export const not = (fn: any) => (...args: any[]) => !fn(...args);
 
-export const startOfString: condition = (str: string, start: number) =>
+export const startOfString: condition = (str, start) =>
   start === 0;
-export const endOfString: condition = (
-  str: string,
-  start: number,
-  end: number
-) => end === str.length;
-export const whitespaceBefore: condition = (str: string, start: number) =>
+export const endOfString: condition = (str, start, end) =>
+  end === str.length;
+export const whitespaceBefore: condition = (str, start) =>
   WHITEPSPACE_DELIMITER.test(str[start - 1]);
-export const whitespaceAfter: condition = (
-  str: string,
-  start: number,
-  end: number
-) => WHITEPSPACE_DELIMITER.test(str[end]);
+export const whitespaceAfter: condition = (str, start, end) =>
+  WHITEPSPACE_DELIMITER.test(str[end]);
 export const whitespaceBeforeOrAfter: condition = or(
   whitespaceBefore,
   whitespaceAfter,
@@ -36,19 +37,19 @@ export const whitespaceBeforeOrAfter: condition = or(
 export const opens = or(whitespaceBefore, startOfString);
 export const closes = or(whitespaceAfter, endOfString);
 
-export const newlineBefore = (
-  string: string,
-  start: number,
-  end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+export const newlineBefore: condition = (
+  string,
+  start,
+  end,
+  prevToken,
+  token,
 ) => {
-  const [tStart] = tokens[index];
+  const [tStart] = token;
   let stringBefore;
 
-  if (index - 1 >= 0) {
+  if (prevToken) {
     // has previous token
-    const [, pTEnd, matcher] = tokens[index - 1];
+    const [, pTEnd, matcher] = prevToken;
 
     // previous token is newline
     if (matcher.id === 1) {
@@ -67,16 +68,16 @@ export const newlineBefore = (
 
   return SPACE_OR_NEWLINE_BEFORE.test(stringBefore);
 };
-export const otherTokenBefore = (
-  string: string,
-  start: number,
-  end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+export const otherTokenBefore: condition = (
+  string,
+  start,
+  end,
+  prevToken,
+  token,
 ) => {
-  if (index - 1 >= 0) {
-    const [, tEnd, prevMatcher] = tokens[index - 1];
-    const [, , currentMatcher] = tokens[index];
+  if (prevToken) {
+    const [, tEnd, prevMatcher] = prevToken;
+    const [, , currentMatcher] = token;
     if (prevMatcher.id !== currentMatcher.id) {
       return start === tEnd;
     }
@@ -85,16 +86,17 @@ export const otherTokenBefore = (
     return false;
   }
 };
-export const otherTokenAfter = (
-  string: string,
-  start: number,
-  end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+export const otherTokenAfter: condition = (
+  string,
+  start,
+  end,
+  prevToken,
+  token,
+  nextToken,
 ) => {
-  if (index + 1 < tokens.length) {
-    const [tStart, , nextMatcher] = tokens[index + 1];
-    const [, , currentMatcher] = tokens[index];
+  if (nextToken) {
+    const [tStart, , nextMatcher] = nextToken;
+    const [, , currentMatcher] = token;
     if (nextMatcher.id !== currentMatcher.id) {
       return end === tStart;
     } else {
