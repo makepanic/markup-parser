@@ -197,6 +197,11 @@ body {
   border-top: 0;
 }
 
+#output em {
+  background-color: #fffa9d;
+  font-style: normal;
+}
+
 .node__rule--0 {background-color: var(--oc-gray-8);}
 .node__rule--1 {background-color: var(--oc-red-8);}
 .node__rule--2 {background-color: var(--oc-pink-8);}

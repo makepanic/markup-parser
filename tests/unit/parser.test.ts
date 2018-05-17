@@ -40,7 +40,7 @@ test("it works", t => {
 test("peek is bitmask aware", t => {
   const parser = new Parser(grammar, new TextRule(Type.Text, t => `${t}`));
 
-  const tokens: Array<Token> = [
+  const tokens: Token[] = [
     new Token(0, 1, Type.A, TokenKind.Default | TokenKind.Closes),
     new Token(
       3,

@@ -1,8 +1,8 @@
 import Rule from "./rule/Rule";
 
 class Grammar {
-  readonly rules: Array<Rule> = [];
-  readonly ruleOpenLookup: { [key: number]: Array<Rule> } = {};
+  readonly rules: Rule[] = [];
+  readonly ruleOpenLookup: { [key: number]: Rule[] } = {};
 
   add(rule: Rule) {
     this.rules.push(rule);

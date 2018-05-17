@@ -6,7 +6,7 @@ export interface ConstraintFunction {
     start: number,
     end: number,
     index?: number,
-    tokens?: Array<any>
+    tokens?: any[]
   ): boolean;
 }
 

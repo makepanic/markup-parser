@@ -5,12 +5,12 @@ const returnTrue = () => true;
 class TokenMatcher {
   readonly regex: RegExp;
   readonly id: number;
-  readonly constraints: Array<KindConstraint>;
+  readonly constraints: KindConstraint[];
 
   constructor(
     regex: RegExp,
     id: number,
-    constraints: Array<KindConstraint> = [[returnTrue, TokenKind.Default]]
+    constraints: KindConstraint[] = [[returnTrue, TokenKind.Default]]
   ) {
     this.regex = regex;
 

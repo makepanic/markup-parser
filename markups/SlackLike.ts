@@ -1,4 +1,4 @@
-import Tokenizer from "../lib/Tokenizer";
+import Tokenizer, { MatchRange } from "../lib/Tokenizer";
 import TokenMatcher from "../lib/token/TokenMatcher";
 import Grammar from "../lib/Grammar";
 import TextRule from "../lib/rule/TextRule";
@@ -36,7 +36,8 @@ export const Type = {
   Bold: 9,
   Italics: 10,
   Strike: 11,
-  Code: 12
+  Code: 12,
+  Highlight: 13
 };
 
 const tokenizer = new Tokenizer(Type.Text, Type.Nul)
@@ -129,6 +130,15 @@ const grammar = new Grammar()
   )
   .add(
     new BlockRule(
+      Type.Highlight,
+      Type.Highlight,
+      children => `<em>${children}</em>`,
+      TokenKind.Opens,
+      TokenKind.Closes
+    )
+  )
+  .add(
+    new BlockRule(
       Type.Quote,
       Type.Nul,
       children => `<blockquote>${children}</blockquote>`
@@ -192,6 +202,14 @@ const parser = new Parser(grammar, new TextRule(Type.Text, text => text));
 
 class SlackLike implements IMarkup {
   types = Type;
+
+  findMatchRanges(string: string, ranges: MatchRange[] = []) {
+    return tokenizer.findMatchRanges(string, ranges);
+  }
+
+  matchTokens(string: string, ranges: MatchRange[]): Token[] {
+    return tokenizer.matchTokens(string, ranges);
+  }
 
   tokenize(input: string): Token[] {
     return tokenizer.tokenize(input);

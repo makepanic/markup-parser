@@ -29,7 +29,7 @@ class Parser {
   peek(
     type: number,
     tokenKind: TokenKind,
-    tokens: Array<Token>,
+    tokens: Token[],
     from: number,
     until: number
   ): PeekResult | undefined {
@@ -53,7 +53,7 @@ class Parser {
    * @param {Token<T extends number>} token
    * @return {Array<Rule<T extends number>>}
    */
-  openRules(token: Token): Array<Rule> {
+  openRules(token: Token): Rule[] {
     return (this.grammar.ruleOpenLookup[+token.id] || []).filter(
       rule => rule.openKind & token.kind
     );
@@ -75,7 +75,7 @@ class Parser {
    * @return {Node<T extends number>}
    */
   parse(
-    tokens: Array<Token>,
+    tokens: Token[],
     from: number = 0,
     until: number = tokens.length,
     parent = new Node()

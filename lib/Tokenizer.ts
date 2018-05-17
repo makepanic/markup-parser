@@ -2,16 +2,16 @@ import TokenMatcher from "./token/TokenMatcher";
 import Token from "./token/Token";
 import TokenKind from "./token/TokenKind";
 
-declare type MatchRange = [number, number, TokenMatcher];
+export declare type MatchRange = [number, number, TokenMatcher];
 type TokenRange = [number, number, number, TokenKind];
 
-function fillArray(array: Array<boolean>, from: number, until: number) {
+function fillArray(array: boolean[], from: number, until: number) {
   for (let i = from; i < until; i++) {
     array[i] = true;
   }
 }
 
-function hasHole(array: Array<boolean>, from: number, until: number) {
+function hasHole(array: boolean[], from: number, until: number) {
   for (let i = from; i < until; i++) {
     if (array[i] === true) {
       return false;
@@ -25,7 +25,7 @@ function hasHole(array: Array<boolean>, from: number, until: number) {
  * @class
  */
 class Tokenizer<T extends number> {
-  private matcher: Array<TokenMatcher>;
+  private matcher: TokenMatcher[];
   private filler: T;
   private escaper: string = "\\";
   private terminator: T;
@@ -43,15 +43,12 @@ class Tokenizer<T extends number> {
   }
 
   /**
-   * Method to extract a list of tokens from a given string.
-   * This happens by matching each tokenizer matching against the string.
+   * Find all match ranges for a given string
    * @param {string} string
-   * @return {Array<Token<T extends number>>}
+   * @param {MatchRange[]} ranges list of already matched ranges
+   * @return {MatchRange[]} list of all matched match ranges
    */
-  tokenize(string: string): Array<Token> {
-    let tokens: Array<MatchRange> = [];
-    const tokensWithText: Array<TokenRange> = [];
-
+  findMatchRanges(string: string, ranges: MatchRange[] = []): MatchRange[] {
     let matchedRangesBuffer: boolean[] = [];
 
     //create list of tokens
@@ -66,15 +63,28 @@ class Tokenizer<T extends number> {
         if (string[start - 1] !== this.escaper) {
           if (hasHole(matchedRangesBuffer, start, end)) {
             fillArray(matchedRangesBuffer, start, end);
-            tokens.push([start, end, matcher]);
+            ranges.push([start, end, matcher]);
           }
         }
       }
     });
 
+    matchedRangesBuffer = null;
+
+    return ranges;
+  }
+
+  /**
+   * Converts a string and a list of match ranges to tokens
+   * @param {string} string
+   * @param {MatchRange[]} ranges
+   * @return {Token[]}
+   */
+  matchTokens(string: string, ranges: MatchRange[]): Token[] {
+    const tokensWithText: TokenRange[] = [];
     let lastEnd = 0;
 
-    tokens
+    ranges
       .sort(([startA], [startB]) => startA - startB)
       .forEach(([start, end, matcher], index, tokens) => {
         // find matching constraint
@@ -102,15 +112,23 @@ class Tokenizer<T extends number> {
       TokenKind.Default
     ]);
 
-    const allTokens = tokensWithText
-      .filter(([start, end]) => start < end)
+    const allTokens: Token[] = tokensWithText
+      .filter(([start, end]) => start <= end)
       .map(([start, end, format, kind]) => new Token(start, end, format, kind));
 
     allTokens.push(new Token(string.length, string.length, this.terminator));
 
-    matchedRangesBuffer = null;
-
     return allTokens;
+  }
+
+  /**
+   * Method to extract a list of tokens from a given string.
+   * This happens by matching each tokenizer matching against the string.
+   * @param {string} string
+   * @return {Array<Token<T extends number>>}
+   */
+  tokenize(string: string): Token[] {
+    return this.matchTokens(string, this.findMatchRanges(string));
   }
 }
 

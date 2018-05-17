@@ -8,7 +8,7 @@ class Node {
   readonly rule: Rule;
   readonly start: number;
   end: number;
-  readonly children: Array<Node> = [];
+  readonly children: Node[] = [];
   parentNode: Node = undefined;
 
   constructor(rule?: Rule, start?: number, end?: number) {

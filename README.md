@@ -15,6 +15,6 @@ TODO:
 
 - String is processed in three steps:
 
-1. Tokenizer(text) -> Array<Token>
-2. Parser(Array<Token>) -> NodeTree
+1. Tokenizer(text) -> Token[]
+2. Parser(Token[]) -> NodeTree
 3. NodeTree(text) -> processed text

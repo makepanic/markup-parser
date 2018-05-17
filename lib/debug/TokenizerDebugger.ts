@@ -2,10 +2,7 @@ import Token from "../token/Token";
 import TokenKind from "../token/TokenKind";
 
 class TokenizerDebugger {
-  static toHTMLElement(
-    text: string,
-    tokens: Array<Token>
-  ): HTMLElement | undefined {
+  static toHTMLElement(text: string, tokens: Token[]): HTMLElement | undefined {
     if (typeof document === "undefined") {
       console.warn("toHTMLElement requires document");
       return;

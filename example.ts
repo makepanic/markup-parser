@@ -19,13 +19,15 @@ function handleInput() {
   const exampleType = type.value;
   const exampleValue = input.value;
   const shouldVisualize = visualize.checked;
+
   let parsed = "";
   let visualizedTokens;
   let visualizedTree;
 
   if (markups[exampleType]) {
     let markup = markups[exampleType];
-    const tokens = markup.tokenize(exampleValue);
+    let tokens= markup.tokenize(exampleValue);
+
     const node = markup.parse(tokens);
 
     if (shouldVisualize) {
@@ -56,7 +58,6 @@ input.oninput = () => handleInput();
 
 input.value = "*bold* _italics_ ~strike~ `code` ```preformatted``` >quote";
 handleInput();
-
 
 
 export default true;
