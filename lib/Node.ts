@@ -7,14 +7,16 @@ import Rule from "./rule/Rule";
 class Node {
   readonly rule: Rule;
   readonly start: number;
+  readonly occluded: boolean = false;
   end: number;
   readonly children: Node[] = [];
   parentNode: Node = undefined;
 
-  constructor(rule?: Rule, start?: number, end?: number) {
+  constructor(rule?: Rule, start?: number, end?: number, occluded?: boolean) {
     this.rule = rule;
     this.start = start;
     this.end = end;
+    this.occluded = occluded;
   }
 
   /**
@@ -37,7 +39,7 @@ class Node {
 
     if (!tree.children.length) {
       if (tree.rule) {
-        return tree.rule.display(string.substring(tree.start, tree.end));
+        return tree.rule.display(string.substring(tree.start, tree.end), tree.occluded);
       } else {
         return "";
       }
@@ -47,7 +49,7 @@ class Node {
         .join("");
 
       if (tree.rule) {
-        return tree.rule.display(childString);
+        return tree.rule.display(childString, tree.occluded);
       } else {
         return childString;
       }

@@ -125,7 +125,7 @@ class Parser {
                 .forEach(token => (token.consumed = true));
 
               node.appendChild(
-                new Node(this.fallbackRule, token.end, closing.token.start)
+                new Node(this.fallbackRule, token.end, closing.token.start, true)
               );
             } else {
               this.parse(tokens, index + 1, index + 1 + closing.idx, node);

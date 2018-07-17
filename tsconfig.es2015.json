@@ -1,18 +1,17 @@
 {
   "include": [
     "lib/**/*.ts",
-    "debug/**/*.ts",
-    "example.ts"
+    "markups/**/*.ts"
   ],
   "sourceMap": true,
   "compilerOptions": {
-    "outFile": "markup-parser.gh-pages.js",
     "pretty": true,
+    "outDir": "./dist/",
     "sourceMap": false,
-    "declaration": false,
+    "declaration": true,
     "noImplicitAny": true,
-    "module": "amd",
-    "target": "es5",
+    "module": "es2015",
+    "target": "es2015",
     "lib": [
       "DOM",
       "es2016",

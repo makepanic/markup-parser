@@ -7,7 +7,7 @@
   "compilerOptions": {
     "pretty": true,
     "outDir": "./dist/",
-    "sourceMap": true,
+    "sourceMap": false,
     "declaration": true,
     "noImplicitAny": true,
     "module": "commonjs",

@@ -12,6 +12,7 @@ const Type = {
 };
 
 const identityTextRule = new TextRule(Type.Text, a => a);
+const occlusionAwareTextRule = new TextRule(Type.Text, (a, occluded) => occluded ? new Array(a.length + 1).join('*') : a);
 
 test("appendChild", function(t) {
   const parentNode = new Node();
@@ -113,4 +114,20 @@ test("expands nested nodes", function(t) {
 test("expand always returns a string even without rule", t => {
   const node = new Node();
   t.is(node.expand("foo"), "");
+});
+
+test("passes occlusion status to display function", function(t) {
+  const rootNode = new Node();
+
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 0, 26));
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 26, 33, true));
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 33, 37));
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 37, 44, true));
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 44, 49));
+  rootNode.appendChild(new Node(occlusionAwareTextRule, 49, 49 + 7, true));
+
+  t.is(
+    rootNode.expand("<AzureDiamond> you can go hunter2 my hunter2-ing hunter2"),
+    "<AzureDiamond> you can go ******* my *******-ing *******"
+  );
 });
