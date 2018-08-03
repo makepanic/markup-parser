@@ -1,5 +1,5 @@
 import RuleProperty from "./RuleProperty";
-import Rule from "./Rule";
+import Rule, { DisplayFunction } from "./Rule";
 import TokenKind from "../token/TokenKind";
 
 /**
@@ -9,7 +9,7 @@ class BlockRule extends Rule {
   constructor(
     open: number,
     close: number,
-    display: (text: string) => string,
+    display: DisplayFunction,
     kindOpen = TokenKind.Default,
     kindClosed = TokenKind.Default,
     occludes = false

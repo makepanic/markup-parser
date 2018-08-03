@@ -1,4 +1,5 @@
 import Rule from "./rule/Rule";
+import { TokenMeta } from "./token/TokenMeta";
 
 /**
  * Class that represents a formatted node.
@@ -11,12 +12,20 @@ class Node {
   end: number;
   readonly children: Node[] = [];
   parentNode: Node = undefined;
+  readonly meta?: TokenMeta;
 
-  constructor(rule?: Rule, start?: number, end?: number, occluded?: boolean) {
+  constructor(
+    rule?: Rule,
+    start?: number,
+    end?: number,
+    occluded?: boolean,
+    meta?: TokenMeta
+  ) {
     this.rule = rule;
     this.start = start;
     this.end = end;
     this.occluded = occluded;
+    this.meta = meta;
   }
 
   /**
@@ -39,7 +48,11 @@ class Node {
 
     if (!tree.children.length) {
       if (tree.rule) {
-        return tree.rule.display(string.substring(tree.start, tree.end), tree.occluded);
+        return tree.rule.display(
+          string.substring(tree.start, tree.end),
+          tree.occluded,
+          tree.meta
+        );
       } else {
         return "";
       }
@@ -49,7 +62,7 @@ class Node {
         .join("");
 
       if (tree.rule) {
-        return tree.rule.display(childString, tree.occluded);
+        return tree.rule.display(childString, tree.occluded, tree.meta);
       } else {
         return childString;
       }

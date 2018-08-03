@@ -1,6 +1,9 @@
 import Surku = require("surku");
 import test from "ava";
-import SlackLike from "../../../markups/SlackLike";
+import SlackLike, { Type } from "../../../markups/SlackLike";
+import TokenMatcher from "../../../lib/token/TokenMatcher";
+import TokenKind from "../../../lib/token/TokenKind";
+import { MatchRange } from "../../../lib/Tokenizer";
 
 const expectations = [
   ["> foo", "<blockquote> foo</blockquote>"],
@@ -178,6 +181,33 @@ expectations.forEach(([input, expected]) => {
   test(input, t => {
     t.is(markup.format(input), expected);
   });
+});
+
+test("tokenMeta", function(t) {
+  const openingMatcher = new TokenMatcher(undefined, Type.User, [
+    [() => true, TokenKind.Opens]
+  ]);
+  const closingMatcher = new TokenMatcher(undefined, Type.User, [
+    [() => true, TokenKind.Closes]
+  ]);
+
+  const text =
+    "Hi @Hunter Two please read the rules and report to @Azure Diamond";
+  const metaTokens: MatchRange[] = [
+    [3, 14, openingMatcher, { user: "0x1" }],
+    [3, 14, closingMatcher],
+    [51, 65, openingMatcher, { user: "0x2" }],
+    [51, 65, closingMatcher]
+  ];
+
+  const matchRanges = markup.findMatchRanges(text, metaTokens);
+  const tokens = markup.matchTokens(text, matchRanges);
+  const parsed = markup.parse(tokens).expand(text);
+
+  t.is(
+    parsed,
+    'Hi <span data-user="0x1">@Hunter Two</span> please read the rules and report to <span data-user="0x2">@Azure Diamond</span>'
+  );
 });
 
 test("fuzzer", t => {

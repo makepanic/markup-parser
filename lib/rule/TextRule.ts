@@ -1,4 +1,4 @@
-import Rule, {DisplayFunction} from "./Rule";
+import Rule, { DisplayFunction } from "./Rule";
 import RuleProperty from "./RuleProperty";
 
 /**

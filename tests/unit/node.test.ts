@@ -12,7 +12,10 @@ const Type = {
 };
 
 const identityTextRule = new TextRule(Type.Text, a => a);
-const occlusionAwareTextRule = new TextRule(Type.Text, (a, occluded) => occluded ? new Array(a.length + 1).join('*') : a);
+const occlusionAwareTextRule = new TextRule(
+  Type.Text,
+  (a, occluded) => (occluded ? new Array(a.length + 1).join("*") : a)
+);
 
 test("appendChild", function(t) {
   const parentNode = new Node();

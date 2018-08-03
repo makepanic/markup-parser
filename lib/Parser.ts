@@ -116,7 +116,13 @@ class Parser {
             // create node from token start to closing end
             token.consumed = true;
             closing.token.consumed = true;
-            const node = new Node(rule, token.start, closing.token.end);
+            const node = new Node(
+              rule,
+              token.start,
+              closing.token.end,
+              false,
+              token.meta
+            );
 
             if (rule.occludes) {
               // occluded tokens create a fallback rule in range
@@ -125,7 +131,12 @@ class Parser {
                 .forEach(token => (token.consumed = true));
 
               node.appendChild(
-                new Node(this.fallbackRule, token.end, closing.token.start, true)
+                new Node(
+                  this.fallbackRule,
+                  token.end,
+                  closing.token.start,
+                  true
+                )
               );
             } else {
               this.parse(tokens, index + 1, index + 1 + closing.idx, node);

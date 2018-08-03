@@ -27,11 +27,11 @@
     "benchmark": "^2.1.4",
     "nyc": "^11.1.0",
     "open-color": "^1.5.1",
-    "prettier": "^1.12.1",
+    "prettier": "^1.14.0",
     "spectre.css": "^0.2.14",
     "surku": "^0.1.14",
     "typedoc": "^0.8.0",
-    "typescript": "^2.8.3"
+    "typescript": "^3.0.1"
   },
   "prettier": {
     "parser": "typescript"

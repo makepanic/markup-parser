@@ -37,7 +37,8 @@ export const Type = {
   Italics: 10,
   Strike: 11,
   Code: 12,
-  Highlight: 13
+  Highlight: 13,
+  User: 14
 };
 
 const tokenizer = new Tokenizer(Type.Text, Type.Nul)
@@ -133,6 +134,18 @@ const grammar = new Grammar()
       Type.Highlight,
       Type.Highlight,
       children => `<em>${children}</em>`,
+      TokenKind.Opens,
+      TokenKind.Closes
+    )
+  )
+  .add(
+    new BlockRule(
+      Type.User,
+      Type.User,
+      (children, occluded, meta) =>
+        meta && meta.user
+          ? `<span data-user="${meta.user}">${children}</span>`
+          : children,
       TokenKind.Opens,
       TokenKind.Closes
     )

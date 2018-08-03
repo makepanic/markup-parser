@@ -1,9 +1,10 @@
 import TokenMatcher from "./token/TokenMatcher";
 import Token from "./token/Token";
 import TokenKind from "./token/TokenKind";
+import { TokenMeta } from "./token/TokenMeta";
 
-export declare type MatchRange = [number, number, TokenMatcher];
-type TokenRange = [number, number, number, TokenKind];
+export declare type MatchRange = [number, number, TokenMatcher, TokenMeta?];
+type TokenRange = [number, number, number, TokenKind, TokenMeta?];
 
 function fillArray(array: boolean[], from: number, until: number) {
   for (let i = from; i < until; i++) {
@@ -86,7 +87,7 @@ class Tokenizer<T extends number> {
 
     ranges
       .sort(([startA], [startB]) => startA - startB)
-      .forEach(([start, end, matcher], index, tokens) => {
+      .forEach(([start, end, matcher, meta], index, tokens) => {
         // find matching constraint
         const matchingConstraints = matcher.constraints.filter(([constraint]) =>
           constraint(string, start, end, index, tokens)
@@ -98,7 +99,7 @@ class Tokenizer<T extends number> {
             TokenKind.Default
           );
           // [n, m, Bold, Closes]
-          let token: TokenRange = [start, end, matcher.id, mergedKinds];
+          let token: TokenRange = [start, end, matcher.id, mergedKinds, meta];
           tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
           tokensWithText.push(token);
           lastEnd = end;
@@ -114,7 +115,10 @@ class Tokenizer<T extends number> {
 
     const allTokens: Token[] = tokensWithText
       .filter(([start, end]) => start <= end)
-      .map(([start, end, format, kind]) => new Token(start, end, format, kind));
+      .map(
+        ([start, end, format, kind, meta]) =>
+          new Token(start, end, format, kind, meta)
+      );
 
     allTokens.push(new Token(string.length, string.length, this.terminator));
 
