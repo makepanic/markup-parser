@@ -12,18 +12,18 @@ export const or = (...fns: any[]) => (...args: any[]) =>
 
 export const not = (fn: any) => (...args: any[]) => !fn(...args);
 
-export const startOfString: condition = (str: string, start: number) =>
+export const startOfString: condition = (_str: string, start: number) =>
   start === 0;
 export const endOfString: condition = (
   str: string,
-  start: number,
+  _start: number,
   end: number
 ) => end === str.length;
 export const whitespaceBefore: condition = (str: string, start: number) =>
   WHITEPSPACE_DELIMITER.test(str[start - 1]);
 export const whitespaceAfter: condition = (
   str: string,
-  start: number,
+  _start: number,
   end: number
 ) => WHITEPSPACE_DELIMITER.test(str[end]);
 export const whitespaceBeforeOrAfter: condition = or(
@@ -38,8 +38,8 @@ export const closes = or(whitespaceAfter, endOfString);
 
 export const newlineBefore = (
   string: string,
-  start: number,
-  end: number,
+  _start: number,
+  _end: number,
   index: number,
   tokens: Array<[number, number, TokenMatcher]>
 ) => {
@@ -68,9 +68,9 @@ export const newlineBefore = (
   return SPACE_OR_NEWLINE_BEFORE.test(stringBefore);
 };
 export const otherTokenBefore = (
-  string: string,
+  _string: string,
   start: number,
-  end: number,
+  _end: number,
   index: number,
   tokens: Array<[number, number, TokenMatcher]>
 ) => {
@@ -86,8 +86,8 @@ export const otherTokenBefore = (
   }
 };
 export const otherTokenAfter = (
-  string: string,
-  start: number,
+  _string: string,
+  _start: number,
   end: number,
   index: number,
   tokens: Array<[number, number, TokenMatcher]>

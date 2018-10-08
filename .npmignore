@@ -1,0 +1,12 @@
+# ignore everything
+*
+
+# except
+
+# typescript definition file
+!index.d.ts
+
+# source files
+!lib/**/*.js
+!README.md
+!LICENSE

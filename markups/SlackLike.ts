@@ -142,7 +142,7 @@ const grammar = new Grammar()
     new BlockRule(
       Type.User,
       Type.User,
-      (children, occluded, meta) =>
+      (children, _occluded, meta) =>
         meta && meta.user
           ? `<span data-user="${meta.user}">${children}</span>`
           : children,
@@ -216,7 +216,7 @@ const parser = new Parser(grammar, new TextRule(Type.Text, text => text));
 class SlackLike implements IMarkup {
   types = Type;
 
-  findMatchRanges(string: string, ranges: MatchRange[] = []) {
+  findMatchRanges(string: string, ranges: MatchRange[] = []): MatchRange[] {
     return tokenizer.findMatchRanges(string, ranges);
   }
 

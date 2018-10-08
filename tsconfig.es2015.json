@@ -1,24 +1,7 @@
 {
-  "include": [
-    "lib/**/*.ts",
-    "markups/**/*.ts"
-  ],
-  "sourceMap": true,
+  "extends": "./tsconfig.json",
+  "sourceMap": false,
   "compilerOptions": {
-    "pretty": true,
-    "outDir": "./dist/",
-    "sourceMap": false,
-    "declaration": true,
-    "noImplicitAny": true,
-    "module": "es2015",
-    "target": "es2015",
-    "lib": [
-      "DOM",
-      "es2016",
-      "es5",
-      "es2015.core",
-      "es2015.collection",
-      "es2016.array.include"
-    ]
+    "module": "es2015"
   }
 }

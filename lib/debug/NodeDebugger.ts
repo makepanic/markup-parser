@@ -49,15 +49,13 @@ function nest(string: string, node: Node, parentNode: HTMLElement) {
 }
 
 class NodeDebugger {
-  static toHTMLElement<T extends number>(
+  static toHTMLElement(
     string: string,
     node: Node,
-    width: number,
-    height: number
   ): HTMLElement | undefined {
     if (typeof document === "undefined") {
       console.warn("toHTMLElement requires document");
-      return;
+      return undefined;
     }
 
     const root = document.createElement("div");

@@ -1,6 +1,9 @@
 # markup-parser
 
 [![Build Status](https://travis-ci.org/makepanic/markup-parser.svg?branch=master)](https://travis-ci.org/makepanic/markup-parser)
+[![Dependency Status](https://david-dm.org/makepanic/markup-parser.svg)](https://david-dm.org/makepanic/markup-parser)
+[![Code Climate](https://codeclimate.com/github/makepanic/markup-parser.png)](https://codeclimate.com/github/makepanic/markup-parser)
+[![npm version](https://badge.fury.io/js/markup-parser.svg)](https://www.npmjs.com/package/markup-parser)
 
 [Live preview](https://makepanic.github.io/markup-parser/) of slack like markup.
 

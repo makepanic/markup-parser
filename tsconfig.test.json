@@ -1,25 +1,12 @@
 {
+  "extends": "./tsconfig.json",
   "include": [
     "lib/**/*.ts",
+    "markups/**/*.ts",
     "tests/**/*.ts",
     "targets/**/*.ts"
   ],
-  "sourceMap": true,
   "compilerOptions": {
-    "pretty": true,
-    "outDir": "./dist/",
-    "sourceMap": true,
-    "declaration": true,
-    "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es5",
-    "lib": [
-      "DOM",
-      "es2016",
-      "es5",
-      "es2015.core",
-      "es2015.collection",
-      "es2016.array.include"
-    ]
+    "module": "commonjs"
   }
 }

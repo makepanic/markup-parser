@@ -5,7 +5,7 @@ class TokenizerDebugger {
   static toHTMLElement(text: string, tokens: Token[]): HTMLElement | undefined {
     if (typeof document === "undefined") {
       console.warn("toHTMLElement requires document");
-      return;
+      return undefined;
     }
 
     const p = document.createElement("div");

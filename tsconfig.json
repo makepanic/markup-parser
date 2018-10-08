@@ -1,19 +1,22 @@
 {
   "include": [
-    "lib/**/*.ts",
-    "markups/**/*.ts"
+    "lib/**/*.ts"
   ],
   "sourceMap": true,
   "compilerOptions": {
     "pretty": true,
-    "outDir": "./dist/",
     "sourceMap": false,
-    "declaration": true,
+    "declaration": false,
     "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "module": "commonjs",
-    "target": "es5",
+    "target": "ES2017",
     "lib": [
-      "DOM",
+      "dom",
       "es2016",
       "es5",
       "es2015.core",

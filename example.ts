@@ -31,7 +31,7 @@ function handleInput() {
     const node = markup.parse(tokens);
 
     if (shouldVisualize) {
-      visualizedTree = NodeDebugger.toHTMLElement(exampleValue, node, outputTree.offsetWidth, 500);
+      visualizedTree = NodeDebugger.toHTMLElement(exampleValue, node);
       visualizedTokens = TokenizerDebugger.toHTMLElement(exampleValue, tokens);
     }
 
