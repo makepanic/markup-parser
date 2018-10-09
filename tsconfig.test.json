@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "include": [
+    "index.ts",
     "lib/**/*.ts",
     "markups/**/*.ts",
     "tests/**/*.ts",

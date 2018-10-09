@@ -49,10 +49,7 @@ function nest(string: string, node: Node, parentNode: HTMLElement) {
 }
 
 class NodeDebugger {
-  static toHTMLElement(
-    string: string,
-    node: Node,
-  ): HTMLElement | undefined {
+  static toHTMLElement(string: string, node: Node): HTMLElement | undefined {
     if (typeof document === "undefined") {
       console.warn("toHTMLElement requires document");
       return undefined;

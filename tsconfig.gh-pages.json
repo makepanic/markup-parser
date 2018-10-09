@@ -1,5 +1,6 @@
 {
   "include": [
+    "index.ts",
     "lib/**/*.ts",
     "markups/**/*.ts",
     "debug/**/*.ts",

@@ -12,10 +12,11 @@
     "build:test": "tsc -p tsconfig.test.json",
     "build:gh-pages": "tsc -p tsconfig.gh-pages.json",
     "docs": "typedoc --out docs --mode file lib",
-    "prettier": "prettier --write '{lib,markups,tests}/**/*.ts'",
+    "prettier": "prettier --write index.ts '{lib,markups,tests}/**/*.ts'",
     "prepublishOnly": "yarn test && yarn build && yarn types",
     "types": "dts-generator --name markup-parser --project . --out index.d.ts"
   },
+  "main": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
