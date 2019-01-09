@@ -55,7 +55,6 @@ test("uses constraint function", function(t) {
   );
 
   t.deepEqual(tokenizerA.tokenize("A").map(token => token.id), [
-    Type.Text,
     Type.A,
     Type.EOL
   ]);

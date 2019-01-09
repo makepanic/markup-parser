@@ -12,6 +12,7 @@ import {
   closes,
   newlineBefore,
   not,
+  sameOpeningBefore,
   opens,
   or,
   otherTokenAfter,
@@ -71,19 +72,40 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   .add(
     new TokenMatcher(/(\*)/g, Type.Bold, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
-      [and(or(closes, otherTokenAfter), not(newlineBefore)), TokenKind.Closes]
+      [
+        and(
+          or(closes, otherTokenAfter),
+          not(sameOpeningBefore),
+          not(newlineBefore)
+        ),
+        TokenKind.Closes
+      ]
     ])
   )
   .add(
     new TokenMatcher(/(_)/g, Type.Italics, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
-      [and(or(closes, otherTokenAfter), not(newlineBefore)), TokenKind.Closes]
+      [
+        and(
+          or(closes, otherTokenAfter),
+          not(sameOpeningBefore),
+          not(newlineBefore)
+        ),
+        TokenKind.Closes
+      ]
     ])
   )
   .add(
     new TokenMatcher(/(~)/g, Type.Strike, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
-      [and(or(closes, otherTokenAfter), not(newlineBefore)), TokenKind.Closes]
+      [
+        and(
+          or(closes, otherTokenAfter),
+          not(sameOpeningBefore),
+          not(newlineBefore)
+        ),
+        TokenKind.Closes
+      ]
     ])
   )
   .add(
@@ -94,7 +116,14 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   .add(
     new TokenMatcher(/(`)/g, Type.Code, [
       [or(opens, otherTokenBefore), TokenKind.Opens],
-      [and(or(closes, otherTokenAfter), not(newlineBefore)), TokenKind.Closes]
+      [
+        and(
+          or(closes, otherTokenAfter),
+          not(sameOpeningBefore),
+          not(newlineBefore)
+        ),
+        TokenKind.Closes
+      ]
     ])
   );
 
@@ -214,8 +243,6 @@ const grammar = new Grammar()
 const parser = new Parser(grammar, new TextRule(Type.Text, text => text));
 
 class SlackLike implements IMarkup {
-  types = Type;
-
   findMatchRanges(string: string, ranges: MatchRange[] = []): MatchRange[] {
     return tokenizer.findMatchRanges(string, ranges);
   }

@@ -172,7 +172,8 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
   [
     "` _upsert_ is prone...\n` _getByCreator_ ...",
     "` <i>upsert</i> is prone...<br>` <i>getByCreator</i> ..."
-  ]
+  ],
+  ["**", "**"]
 ];
 
 const markup = new SlackLike();

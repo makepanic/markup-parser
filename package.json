@@ -35,10 +35,20 @@
     "prettier": "^1.15.3",
     "spectre.css": "^0.5.8",
     "surku": "^0.1.14",
+    "ts-node": "^7.0.1",
     "typedoc": "^0.14.0",
     "typescript": "^3.2.2"
   },
   "prettier": {
     "parser": "typescript"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register/transpile-only"
+    ]
   }
 }

@@ -1,13 +1,16 @@
 import TokenKind from "./TokenKind";
+import { MatchRange } from "../Tokenizer";
+import Token from "./Token";
 
-export interface ConstraintFunction {
+export interface Constraint {
   (
     string: string,
     start: number,
     end: number,
     index?: number,
-    tokens?: any[]
+    tokens?: MatchRange[],
+    previousTokens?: Token[]
   ): boolean;
 }
 
-export type KindConstraint = [ConstraintFunction, TokenKind];
+export type KindConstraint = [Constraint, TokenKind];

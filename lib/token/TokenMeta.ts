@@ -1,3 +1,3 @@
-export declare interface TokenMeta {
+export interface TokenMeta {
   [key: string]: any;
 }

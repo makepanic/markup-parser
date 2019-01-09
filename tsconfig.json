@@ -14,7 +14,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "module": "ES2015",
+    "module": "commonjs",
     "target": "ES2017",
     "lib": [
       "dom",

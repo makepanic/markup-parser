@@ -1,32 +1,25 @@
-import TokenMatcher from "../token/TokenMatcher";
+import TokenKind from "../token/TokenKind";
+import { Constraint } from "../token/TokenKindConstraint";
 
-const WHITEPSPACE_DELIMITER = /[\n :.,+&?!/()]/;
+const WHITESPACE_DELIMITER = /[\n :.,+&?!/()]/;
 const SPACE_OR_NEWLINE_BEFORE = /^[ \n]+$/;
 
-export type condition = (str: string, start: number, end?: number) => boolean;
+type Merge<T> = (...f: T[]) => T;
+type Identity<T> = (f: T) => T;
 
-export const and = (...fns: any[]) => (...args: any[]) =>
+export const and: Merge<Constraint> = (...fns) => (...args) =>
   fns.every(fn => fn(...args));
-export const or = (...fns: any[]) => (...args: any[]) =>
+export const or: Merge<Constraint> = (...fns) => (...args) =>
   fns.some(fn => fn(...args));
+export const not: Identity<Constraint> = fn => (...args) => !fn(...args);
 
-export const not = (fn: any) => (...args: any[]) => !fn(...args);
-
-export const startOfString: condition = (_str: string, start: number) =>
-  start === 0;
-export const endOfString: condition = (
-  str: string,
-  _start: number,
-  end: number
-) => end === str.length;
-export const whitespaceBefore: condition = (str: string, start: number) =>
-  WHITEPSPACE_DELIMITER.test(str[start - 1]);
-export const whitespaceAfter: condition = (
-  str: string,
-  _start: number,
-  end: number
-) => WHITEPSPACE_DELIMITER.test(str[end]);
-export const whitespaceBeforeOrAfter: condition = or(
+export const startOfString: Constraint = (_, start) => start === 0;
+export const endOfString: Constraint = (str, _, end) => end === str.length;
+export const whitespaceBefore: Constraint = (str, start) =>
+  WHITESPACE_DELIMITER.test(str[start - 1]);
+export const whitespaceAfter: Constraint = (str, _, end) =>
+  WHITESPACE_DELIMITER.test(str[end]);
+export const whitespaceBeforeOrAfter: Constraint = or(
   whitespaceBefore,
   whitespaceAfter,
   startOfString,
@@ -36,12 +29,12 @@ export const whitespaceBeforeOrAfter: condition = or(
 export const opens = or(whitespaceBefore, startOfString);
 export const closes = or(whitespaceAfter, endOfString);
 
-export const newlineBefore = (
-  string: string,
-  _start: number,
-  _end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+export const newlineBefore: Constraint = (
+  string,
+  _start,
+  _end,
+  index,
+  tokens
 ) => {
   const [tStart] = tokens[index];
   let stringBefore;
@@ -67,12 +60,12 @@ export const newlineBefore = (
 
   return SPACE_OR_NEWLINE_BEFORE.test(stringBefore);
 };
-export const otherTokenBefore = (
-  _string: string,
-  start: number,
-  _end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+export const otherTokenBefore: Constraint = (
+  _string,
+  start,
+  _end,
+  index,
+  tokens
 ) => {
   if (index - 1 >= 0) {
     const [, tEnd, prevMatcher] = tokens[index - 1];
@@ -80,27 +73,48 @@ export const otherTokenBefore = (
     if (prevMatcher.id !== currentMatcher.id) {
       return start === tEnd;
     }
-    return false;
-  } else {
-    return false;
   }
+  return false;
 };
-export const otherTokenAfter = (
-  _string: string,
-  _start: number,
-  end: number,
-  index: number,
-  tokens: Array<[number, number, TokenMatcher]>
+
+export const otherTokenAfter: Constraint = (
+  _string,
+  _start,
+  end,
+  index,
+  tokens
 ) => {
   if (index + 1 < tokens.length) {
     const [tStart, , nextMatcher] = tokens[index + 1];
     const [, , currentMatcher] = tokens[index];
     if (nextMatcher.id !== currentMatcher.id) {
       return end === tStart;
-    } else {
-      return false;
     }
-  } else {
-    return false;
   }
+  return false;
+};
+
+export const sameOpeningBefore: Constraint = (
+  _string,
+  start,
+  _end,
+  index,
+  tokens,
+  previousTokens
+) => {
+  const previousToken = previousTokens[index - 1];
+  if (index - 1 >= 0 && previousToken) {
+    const [, tEnd, prevMatcher] = tokens[index - 1];
+    const [, , currentMatcher] = tokens[index];
+    if (
+      // previous is of same type
+      prevMatcher.id === currentMatcher.id &&
+      // previous is opening
+      previousToken.kind & TokenKind.Opens
+    ) {
+      // return true if previous end = this start
+      return tEnd === start;
+    }
+  }
+  return false;
 };

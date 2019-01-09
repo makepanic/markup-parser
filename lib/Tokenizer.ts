@@ -3,8 +3,7 @@ import Token from "./token/Token";
 import TokenKind from "./token/TokenKind";
 import { TokenMeta } from "./token/TokenMeta";
 
-export declare type MatchRange = [number, number, TokenMatcher, TokenMeta?];
-type TokenRange = [number, number, number, TokenKind, TokenMeta?];
+export type MatchRange = [number, number, TokenMatcher, TokenMeta?];
 
 function fillArray(array: boolean[], from: number, until: number) {
   for (let i = from; i < until; i++) {
@@ -82,50 +81,44 @@ class Tokenizer<T extends number> {
    * @return {Token[]}
    */
   matchTokens(string: string, ranges: MatchRange[]): Token[] {
-    const tokensWithText: TokenRange[] = [];
+    const tokens: Token[] = [];
     let lastEnd = 0;
 
     ranges
       .sort(([startA], [startB]) => startA - startB)
-      .forEach(([start, end, matcher, meta], index, tokens) => {
+      .forEach(([start, end, matcher, meta], index, ranges) => {
         // find matching constraint
         const matchingConstraints = matcher.constraints.filter(([constraint]) =>
-          constraint(string, start, end, index, tokens)
+          constraint(string, start, end, index, ranges, tokens)
         );
 
-        if (matchingConstraints.length) {
-          let mergedKinds = matchingConstraints.reduce(
-            (all, [, kind]) => all | kind,
-            TokenKind.Default
-          );
-          // [n, m, Bold, Closes]
-          let token: TokenRange = [start, end, matcher.id, mergedKinds, meta];
-          tokensWithText.push([lastEnd, start, this.filler, TokenKind.Default]);
-          tokensWithText.push(token);
-          lastEnd = end;
+        if (!matchingConstraints.length) return;
+
+        let mergedKinds = matchingConstraints.reduce(
+          (all, [, kind]) => all | kind,
+          TokenKind.Default
+        );
+
+        // [n, m, Bold, Closes]
+        let token = new Token(start, end, matcher.id, mergedKinds, meta);
+
+        // only add filler if there's something to fill
+        if (lastEnd < start) {
+          tokens.push(new Token(lastEnd, start, this.filler));
         }
+
+        tokens.push(token);
+        lastEnd = end;
       });
 
     if (lastEnd < string.length) {
       // avoid empty filler if there's nothing left
-      tokensWithText.push([
-        lastEnd,
-        string.length,
-        this.filler,
-        TokenKind.Default
-      ]);
+      tokens.push(new Token(lastEnd, string.length, this.filler));
     }
 
-    const allTokens: Token[] = tokensWithText
-      .filter(([start, end]) => start <= end)
-      .map(
-        ([start, end, format, kind, meta]) =>
-          new Token(start, end, format, kind, meta)
-      );
+    tokens.push(new Token(string.length, string.length, this.terminator));
 
-    allTokens.push(new Token(string.length, string.length, this.terminator));
-
-    return allTokens;
+    return tokens;
   }
 
   /**
