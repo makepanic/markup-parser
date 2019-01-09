@@ -106,12 +106,15 @@ class Tokenizer<T extends number> {
         }
       });
 
-    tokensWithText.push([
-      lastEnd,
-      string.length,
-      this.filler,
-      TokenKind.Default
-    ]);
+    if (lastEnd < string.length) {
+      // avoid empty filler if there's nothing left
+      tokensWithText.push([
+        lastEnd,
+        string.length,
+        this.filler,
+        TokenKind.Default
+      ]);
+    }
 
     const allTokens: Token[] = tokensWithText
       .filter(([start, end]) => start <= end)

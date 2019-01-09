@@ -32,7 +32,7 @@ test("tokenize empty string", function(t) {
     .add(new TokenMatcher(/A/g, Type.A));
 
   const tokens = tokenizer.tokenize("");
-  t.deepEqual(tokens.map(token => token.id), [Type.Text, Type.EOL]);
+  t.deepEqual(tokens.map(token => token.id), [Type.EOL]);
 });
 
 test("uses constraint function", function(t) {
@@ -57,7 +57,6 @@ test("uses constraint function", function(t) {
   t.deepEqual(tokenizerA.tokenize("A").map(token => token.id), [
     Type.Text,
     Type.A,
-    Type.Text,
     Type.EOL
   ]);
   t.deepEqual(tokenizerB.tokenize("A").map(token => token.id), [
