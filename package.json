@@ -14,7 +14,7 @@
     "docs": "typedoc --out docs --mode file lib",
     "prettier": "prettier --write index.ts '{lib,markups,tests}/**/*.ts'",
     "prepublishOnly": "yarn test && yarn build && yarn types",
-    "types": "dts-generator --name markup-parser --project . --out index.d.ts"
+    "types": "dts-generator --prefix markup-parser --project . --out index.d.ts"
   },
   "main": "index.js",
   "types": "index.d.ts",
@@ -26,17 +26,17 @@
   "license": "MIT",
   "devDependencies": {
     "@types/benchmark": "^1.0.31",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.119",
     "ava": "^0.25.0",
     "benchmark": "^2.1.4",
-    "dts-generator": "^2.1.0",
-    "nyc": "^13.0.1",
-    "open-color": "^1.5.1",
-    "prettier": "^1.14.3",
-    "spectre.css": "^0.2.14",
+    "dts-generator": "^3.0.0",
+    "nyc": "^13.1.0",
+    "open-color": "^1.6.3",
+    "prettier": "^1.15.3",
+    "spectre.css": "^0.5.8",
     "surku": "^0.1.14",
-    "typedoc": "^0.12.0",
-    "typescript": "^3.1.1"
+    "typedoc": "^0.14.0",
+    "typescript": "^3.2.2"
   },
   "prettier": {
     "parser": "typescript"
