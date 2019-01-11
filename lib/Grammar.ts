@@ -6,8 +6,8 @@ class Grammar {
 
   add(rule: Rule) {
     this.rules.push(rule);
-    this.ruleOpenLookup[+rule.open] = this.ruleOpenLookup[+rule.open] || [];
-    this.ruleOpenLookup[+rule.open].push(rule);
+    this.ruleOpenLookup[rule.open] = this.ruleOpenLookup[rule.open] || [];
+    this.ruleOpenLookup[rule.open].push(rule);
     return this;
   }
 }
