@@ -72,8 +72,8 @@ define("lib/Grammar", ["require", "exports"], function (require, exports) {
         }
         Grammar.prototype.add = function (rule) {
             this.rules.push(rule);
-            this.ruleOpenLookup[+rule.open] = this.ruleOpenLookup[+rule.open] || [];
-            this.ruleOpenLookup[+rule.open].push(rule);
+            this.ruleOpenLookup[rule.open] = this.ruleOpenLookup[rule.open] || [];
+            this.ruleOpenLookup[rule.open].push(rule);
             return this;
         };
         return Grammar;
@@ -362,7 +362,7 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
          */
         Tokenizer.prototype.matchTokens = function (string, ranges) {
             var _this = this;
-            var tokensWithText = [];
+            var tokens = [];
             var lastEnd = 0;
             ranges
                 .sort(function (_a, _b) {
@@ -370,45 +370,34 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
                 var startB = _b[0];
                 return startA - startB;
             })
-                .forEach(function (_a, index, tokens) {
+                .forEach(function (_a, index, ranges) {
                 var start = _a[0], end = _a[1], matcher = _a[2], meta = _a[3];
                 // find matching constraint
                 var matchingConstraints = matcher.constraints.filter(function (_a) {
                     var constraint = _a[0];
-                    return constraint(string, start, end, index, tokens);
+                    return constraint(string, start, end, index, ranges, tokens);
                 });
-                if (matchingConstraints.length) {
-                    var mergedKinds = matchingConstraints.reduce(function (all, _a) {
-                        var kind = _a[1];
-                        return all | kind;
-                    }, TokenKind_4.default.Default);
-                    // [n, m, Bold, Closes]
-                    var token = [start, end, matcher.id, mergedKinds, meta];
-                    tokensWithText.push([lastEnd, start, _this.filler, TokenKind_4.default.Default]);
-                    tokensWithText.push(token);
-                    lastEnd = end;
+                if (!matchingConstraints.length)
+                    return;
+                var mergedKinds = matchingConstraints.reduce(function (all, _a) {
+                    var kind = _a[1];
+                    return all | kind;
+                }, TokenKind_4.default.Default);
+                // [n, m, Bold, Closes]
+                var token = new Token_1.default(start, end, matcher.id, mergedKinds, meta);
+                // only add filler if there's something to fill
+                if (lastEnd < start) {
+                    tokens.push(new Token_1.default(lastEnd, start, _this.filler));
                 }
+                tokens.push(token);
+                lastEnd = end;
             });
             if (lastEnd < string.length) {
                 // avoid empty filler if there's nothing left
-                tokensWithText.push([
-                    lastEnd,
-                    string.length,
-                    this.filler,
-                    TokenKind_4.default.Default
-                ]);
+                tokens.push(new Token_1.default(lastEnd, string.length, this.filler));
             }
-            var allTokens = tokensWithText
-                .filter(function (_a) {
-                var start = _a[0], end = _a[1];
-                return start <= end;
-            })
-                .map(function (_a) {
-                var start = _a[0], end = _a[1], format = _a[2], kind = _a[3], meta = _a[4];
-                return new Token_1.default(start, end, format, kind, meta);
-            });
-            allTokens.push(new Token_1.default(string.length, string.length, this.terminator));
-            return allTokens;
+            tokens.push(new Token_1.default(string.length, string.length, this.terminator));
+            return tokens;
         };
         /**
          * Method to extract a list of tokens from a given string.
@@ -471,10 +460,10 @@ define("lib/rule/TextRule", ["require", "exports", "lib/rule/Rule", "lib/rule/Ru
     }(Rule_3.default));
     exports.default = TextRule;
 });
-define("lib/utils/Conditions", ["require", "exports"], function (require, exports) {
+define("lib/utils/Conditions", ["require", "exports", "lib/token/TokenKind"], function (require, exports, TokenKind_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var WHITEPSPACE_DELIMITER = /[\n :.,+&?!/()]/;
+    var WHITESPACE_DELIMITER = /[\n :.,+&?!/()]/;
     var SPACE_OR_NEWLINE_BEFORE = /^[ \n]+$/;
     exports.and = function () {
         var fns = [];
@@ -509,14 +498,14 @@ define("lib/utils/Conditions", ["require", "exports"], function (require, export
         }
         return !fn.apply(void 0, args);
     }; };
-    exports.startOfString = function (_str, start) {
-        return start === 0;
-    };
-    exports.endOfString = function (str, _start, end) { return end === str.length; };
+    exports.startOfString = function (_, start) { return start === 0; };
+    exports.endOfString = function (str, _, end) { return end === str.length; };
     exports.whitespaceBefore = function (str, start) {
-        return WHITEPSPACE_DELIMITER.test(str[start - 1]);
+        return WHITESPACE_DELIMITER.test(str[start - 1]);
     };
-    exports.whitespaceAfter = function (str, _start, end) { return WHITEPSPACE_DELIMITER.test(str[end]); };
+    exports.whitespaceAfter = function (str, _, end) {
+        return WHITESPACE_DELIMITER.test(str[end]);
+    };
     exports.whitespaceBeforeOrAfter = exports.or(exports.whitespaceBefore, exports.whitespaceAfter, exports.startOfString, exports.endOfString);
     exports.opens = exports.or(exports.whitespaceBefore, exports.startOfString);
     exports.closes = exports.or(exports.whitespaceAfter, exports.endOfString);
@@ -547,11 +536,8 @@ define("lib/utils/Conditions", ["require", "exports"], function (require, export
             if (prevMatcher.id !== currentMatcher.id) {
                 return start === tEnd;
             }
-            return false;
         }
-        else {
-            return false;
-        }
+        return false;
     };
     exports.otherTokenAfter = function (_string, _start, end, index, tokens) {
         if (index + 1 < tokens.length) {
@@ -560,16 +546,27 @@ define("lib/utils/Conditions", ["require", "exports"], function (require, export
             if (nextMatcher.id !== currentMatcher.id) {
                 return end === tStart;
             }
-            else {
-                return false;
+        }
+        return false;
+    };
+    exports.sameOpeningBefore = function (_string, start, _end, index, tokens, previousTokens) {
+        var previousToken = previousTokens[index - 1];
+        if (index - 1 >= 0 && previousToken) {
+            var _a = tokens[index - 1], tEnd = _a[1], prevMatcher = _a[2];
+            var _b = tokens[index], currentMatcher = _b[2];
+            if (
+            // previous is of same type
+            prevMatcher.id === currentMatcher.id &&
+                // previous is opening
+                previousToken.kind & TokenKind_6.default.Opens) {
+                // return true if previous end = this start
+                return tEnd === start;
             }
         }
-        else {
-            return false;
-        }
+        return false;
     };
 });
-define("index", ["require", "exports", "lib/Grammar", "lib/Node", "lib/Parser", "lib/Tokenizer", "lib/rule/BlockRule", "lib/rule/ConstantRule", "lib/rule/Rule", "lib/rule/RuleProperty", "lib/rule/TextRule", "lib/token/Token", "lib/token/TokenKind", "lib/token/TokenMatcher", "lib/utils/Conditions"], function (require, exports, Grammar_1, Node_2, Parser_1, Tokenizer_1, BlockRule_1, ConstantRule_1, Rule_4, RuleProperty_5, TextRule_1, Token_2, TokenKind_6, TokenMatcher_1, Conditions) {
+define("index", ["require", "exports", "lib/Grammar", "lib/Node", "lib/Parser", "lib/Tokenizer", "lib/rule/BlockRule", "lib/rule/ConstantRule", "lib/rule/Rule", "lib/rule/RuleProperty", "lib/rule/TextRule", "lib/token/Token", "lib/token/TokenKind", "lib/token/TokenMatcher", "lib/utils/Conditions"], function (require, exports, Grammar_1, Node_2, Parser_1, Tokenizer_1, BlockRule_1, ConstantRule_1, Rule_4, RuleProperty_5, TextRule_1, Token_2, TokenKind_7, TokenMatcher_1, Conditions) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Grammar = Grammar_1.default;
@@ -582,7 +579,7 @@ define("index", ["require", "exports", "lib/Grammar", "lib/Node", "lib/Parser", 
     exports.RuleProperty = RuleProperty_5.default;
     exports.TextRule = TextRule_1.default;
     exports.Token = Token_2.default;
-    exports.TokenKind = TokenKind_6.default;
+    exports.TokenKind = TokenKind_7.default;
     exports.TokenMatcher = TokenMatcher_1.default;
     exports.Conditions = Conditions;
 });
@@ -643,7 +640,7 @@ define("lib/debug/NodeDebugger", ["require", "exports"], function (require, expo
     }());
     exports.default = NodeDebugger;
 });
-define("lib/debug/TokenizerDebugger", ["require", "exports", "lib/token/TokenKind"], function (require, exports, TokenKind_7) {
+define("lib/debug/TokenizerDebugger", ["require", "exports", "lib/token/TokenKind"], function (require, exports, TokenKind_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TokenizerDebugger = /** @class */ (function () {
@@ -662,9 +659,9 @@ define("lib/debug/TokenizerDebugger", ["require", "exports", "lib/token/TokenKin
                 var tokenHead = document.createElement("div");
                 tokenHead.className = "token__head";
                 var tokenKindStrings = [];
-                tokenKindStrings.push(token.kind & TokenKind_7.default.Default ? "Default" : undefined);
-                tokenKindStrings.push(token.kind & TokenKind_7.default.Opens ? "Opens" : undefined);
-                tokenKindStrings.push(token.kind & TokenKind_7.default.Closes ? "Closes" : undefined);
+                tokenKindStrings.push(token.kind & TokenKind_8.default.Default ? "Default" : undefined);
+                tokenKindStrings.push(token.kind & TokenKind_8.default.Opens ? "Opens" : undefined);
+                tokenKindStrings.push(token.kind & TokenKind_8.default.Closes ? "Closes" : undefined);
                 tokenHead.innerText = token.id + " " + tokenKindStrings
                     .filter(Boolean)
                     .join("|") + " (" + token.start + ".." + token.end + ")";
@@ -685,7 +682,7 @@ define("markups/IMarkup", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/TokenMatcher", "lib/Grammar", "lib/rule/TextRule", "lib/rule/BlockRule", "lib/rule/ConstantRule", "lib/Parser", "lib/token/TokenKind", "lib/utils/Conditions"], function (require, exports, Tokenizer_2, TokenMatcher_2, Grammar_2, TextRule_2, BlockRule_2, ConstantRule_2, Parser_2, TokenKind_8, Conditions_1) {
+define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/TokenMatcher", "lib/Grammar", "lib/rule/TextRule", "lib/rule/BlockRule", "lib/rule/ConstantRule", "lib/Parser", "lib/token/TokenKind", "lib/utils/Conditions"], function (require, exports, Tokenizer_2, TokenMatcher_2, Grammar_2, TextRule_2, BlockRule_2, ConstantRule_2, Parser_2, TokenKind_9, Conditions_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Type = {
@@ -710,7 +707,7 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         .add(new TokenMatcher_2.default(/(>)/g, exports.Type.Quote, [
         [
             Conditions_1.and(Conditions_1.or(Conditions_1.startOfString, Conditions_1.newlineBefore), Conditions_1.whitespaceAfter),
-            TokenKind_8.default.Default
+            TokenKind_9.default.Default
         ]
     ]))
         .add(new TokenMatcher_2.default(/(\\)/g, exports.Type.Escape))
@@ -719,23 +716,35 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         .add(new TokenMatcher_2.default(/\b(([\w+\-.]+)@\w+?(?:\.[a-zA-Z]{2,6}))+\b/gi, exports.Type.Email))
         .add(new TokenMatcher_2.default(/\b\S+\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)(\/[a-z0-9-+&@#\/%=~_|]*)*\b/gi, exports.Type.PseudoUrl))
         .add(new TokenMatcher_2.default(/(\*)/g, exports.Type.Bold, [
-        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_8.default.Opens],
-        [Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.newlineBefore)), TokenKind_8.default.Closes]
+        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
+        [
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            TokenKind_9.default.Closes
+        ]
     ]))
         .add(new TokenMatcher_2.default(/(_)/g, exports.Type.Italics, [
-        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_8.default.Opens],
-        [Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.newlineBefore)), TokenKind_8.default.Closes]
+        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
+        [
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            TokenKind_9.default.Closes
+        ]
     ]))
         .add(new TokenMatcher_2.default(/(~)/g, exports.Type.Strike, [
-        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_8.default.Opens],
-        [Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.newlineBefore)), TokenKind_8.default.Closes]
+        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
+        [
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            TokenKind_9.default.Closes
+        ]
     ]))
         .add(new TokenMatcher_2.default(/(```)/g, exports.Type.Preformatted, [
-        [Conditions_1.and(Conditions_1.whitespaceBeforeOrAfter), TokenKind_8.default.Default]
+        [Conditions_1.and(Conditions_1.whitespaceBeforeOrAfter), TokenKind_9.default.Default]
     ]))
         .add(new TokenMatcher_2.default(/(`)/g, exports.Type.Code, [
-        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_8.default.Opens],
-        [Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.newlineBefore)), TokenKind_8.default.Closes]
+        [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
+        [
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            TokenKind_9.default.Closes
+        ]
     ]));
     var grammar = new Grammar_2.default()
         .add(new ConstantRule_2.default(exports.Type.Newline, "<br>"))
@@ -750,28 +759,27 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         return "<a href=\"mailto:" + text + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + text + "</a>";
     }))
         .add(new BlockRule_2.default(exports.Type.Quote, exports.Type.Newline, function (children) { return "<blockquote>" + children + "</blockquote>"; }))
-        .add(new BlockRule_2.default(exports.Type.Highlight, exports.Type.Highlight, function (children) { return "<em>" + children + "</em>"; }, TokenKind_8.default.Opens, TokenKind_8.default.Closes))
+        .add(new BlockRule_2.default(exports.Type.Highlight, exports.Type.Highlight, function (children) { return "<em>" + children + "</em>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
         .add(new BlockRule_2.default(exports.Type.User, exports.Type.User, function (children, _occluded, meta) {
         return meta && meta.user
             ? "<span data-user=\"" + meta.user + "\">" + children + "</span>"
             : children;
-    }, TokenKind_8.default.Opens, TokenKind_8.default.Closes))
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
         .add(new BlockRule_2.default(exports.Type.Quote, exports.Type.Nul, function (children) { return "<blockquote>" + children + "</blockquote>"; }))
-        .add(new BlockRule_2.default(exports.Type.Bold, exports.Type.Bold, function (children) { return "<strong>" + children + "</strong>"; }, TokenKind_8.default.Opens, TokenKind_8.default.Closes))
-        .add(new BlockRule_2.default(exports.Type.Italics, exports.Type.Italics, function (children) { return "<i>" + children + "</i>"; }, TokenKind_8.default.Opens, TokenKind_8.default.Closes))
+        .add(new BlockRule_2.default(exports.Type.Bold, exports.Type.Bold, function (children) { return "<strong>" + children + "</strong>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
+        .add(new BlockRule_2.default(exports.Type.Italics, exports.Type.Italics, function (children) { return "<i>" + children + "</i>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
         .add(new BlockRule_2.default(exports.Type.Strike, exports.Type.Strike, function (children) {
         return "<strike>" + children + "</strike>";
-    }, TokenKind_8.default.Opens, TokenKind_8.default.Closes))
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
         .add(new BlockRule_2.default(exports.Type.Preformatted, exports.Type.Preformatted, function (children) {
         return "<pre>" + children + "</pre>";
-    }, TokenKind_8.default.Default, TokenKind_8.default.Default, true))
+    }, TokenKind_9.default.Default, TokenKind_9.default.Default, true))
         .add(new BlockRule_2.default(exports.Type.Code, exports.Type.Code, function (children) {
         return "<code>" + children + "</code>";
-    }, TokenKind_8.default.Opens, TokenKind_8.default.Closes, true));
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, true));
     var parser = new Parser_2.default(grammar, new TextRule_2.default(exports.Type.Text, function (text) { return text; }));
     var SlackLike = /** @class */ (function () {
         function SlackLike() {
-            this.types = exports.Type;
         }
         SlackLike.prototype.findMatchRanges = function (string, ranges) {
             if (ranges === void 0) { ranges = []; }
