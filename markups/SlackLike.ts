@@ -12,11 +12,11 @@ import {
   closes,
   newlineBefore,
   not,
-  sameOpeningBefore,
   opens,
   or,
   otherTokenAfter,
   otherTokenBefore,
+  sameOpeningBefore,
   startOfString,
   whitespaceAfter,
   whitespaceBeforeOrAfter
