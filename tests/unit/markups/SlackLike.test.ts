@@ -176,7 +176,13 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
   ["**", "**"],
   ["__", "__"],
   ["~~", "~~"],
-  ["``", "``"]
+  ["``", "``"],
+  ["~1 text ~1", "~1 text ~1"],
+  [
+    "some user (some.user@my-cool-mail.com) is cool",
+    'some user (<a href="http://some.user@my-cool-mail.com" target="_blank" rel="noopener noreferrer">some.user@my-cool-mail.com</a>) is cool'
+  ],
+  ["```code``` > quote", "<pre>code</pre> > quote"]
 ];
 
 const markup = new SlackLike();

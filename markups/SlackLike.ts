@@ -10,7 +10,7 @@ import TokenKind from "../lib/token/TokenKind";
 import {
   and,
   closes,
-  newlineBefore,
+  spaceOrNewlineBefore,
   not,
   opens,
   or,
@@ -19,7 +19,8 @@ import {
   sameOpeningBefore,
   startOfString,
   whitespaceAfter,
-  whitespaceBeforeOrAfter
+  whitespaceBeforeOrAfter,
+  newlineBefore
 } from "../lib/utils/Conditions";
 import IMarkup from "./IMarkup";
 import Token from "../lib/token/Token";
@@ -76,7 +77,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
         and(
           or(closes, otherTokenAfter),
           not(sameOpeningBefore),
-          not(newlineBefore)
+          not(spaceOrNewlineBefore)
         ),
         TokenKind.Closes
       ]
@@ -89,7 +90,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
         and(
           or(closes, otherTokenAfter),
           not(sameOpeningBefore),
-          not(newlineBefore)
+          not(spaceOrNewlineBefore)
         ),
         TokenKind.Closes
       ]
@@ -102,7 +103,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
         and(
           or(closes, otherTokenAfter),
           not(sameOpeningBefore),
-          not(newlineBefore)
+          not(spaceOrNewlineBefore)
         ),
         TokenKind.Closes
       ]
@@ -120,7 +121,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
         and(
           or(closes, otherTokenAfter),
           not(sameOpeningBefore),
-          not(newlineBefore)
+          not(spaceOrNewlineBefore)
         ),
         TokenKind.Closes
       ]
