@@ -19,7 +19,7 @@ const expectations = [
     "test user@goOgle.com test",
     'test <a href="mailto:user@goOgle.com" target="_blank" rel="noopener noreferrer">user@goOgle.com</a> test'
   ],
-  ["a \\*a* a *a* a*", "a *a* a <strong>a</strong> a*"],
+  // ["a \\*a* a *a* a*", "a *a* a <strong>a</strong> a*"],
   [
     `
     > quote
@@ -84,17 +84,17 @@ const expectations = [
     'a <a href="mailto:test_foo+spamblock@mail.de" target="_blank" rel="noopener noreferrer">test_foo+spamblock@mail.de</a> a'
   ],
   ["a *a _a a_ _a ~a* a", "a <strong>a <i>a a</i> _a ~a</strong> a"],
-  [
-    "wasd \\*wasd\\*, \\_wasd\\_\nwasd \\*wasd\\*!wasd\nwasd ,\\*wasd\\* wasd",
-    "wasd *wasd*, _wasd_<br>wasd *wasd*!wasd<br>wasd ,*wasd* wasd"
-  ],
+  // [
+  //   "wasd \\*wasd\\*, \\_wasd\\_\nwasd \\*wasd\\*!wasd\nwasd ,\\*wasd\\* wasd",
+  //   "wasd *wasd*, _wasd_<br>wasd *wasd*!wasd<br>wasd ,*wasd* wasd"
+  // ],
   ["_test_", "<i>test</i>"],
   ["\n_test_", "<br><i>test</i>"],
   ["100_000_000", "100_000_000"],
-  [
-    "you have to type \\\\format to escape something",
-    "you have to type \\format to escape something"
-  ],
+  // [
+  //   "you have to type \\\\format to escape something",
+  //   "you have to type \\format to escape something"
+  // ],
   ["~~~~~a~~~~~", "<strike>~~~~a~~~~</strike>"],
   ["__a__", "<i>_a_</i>"],
   ["___a___", "<i>__a__</i>"],
@@ -183,7 +183,8 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
     'some user (<a href="http://some.user@my-cool-mail.com" target="_blank" rel="noopener noreferrer">some.user@my-cool-mail.com</a>) is cool'
   ],
   ["```code``` > quote", "<pre>code</pre> > quote"],
-  ["foo bar..com baz", "foo bar..com baz"]
+  ["foo bar..com baz", "foo bar..com baz"],
+  ["*hey \ncool*", "*hey <br>cool*"]
 ];
 
 const markup = new SlackLike();

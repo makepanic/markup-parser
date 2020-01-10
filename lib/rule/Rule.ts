@@ -7,31 +7,16 @@ export interface DisplayFunction {
 }
 
 class Rule {
-  readonly open: number;
-  readonly openKind: TokenKind;
-  readonly close: number;
-  readonly closesKind: TokenKind;
-  readonly display: DisplayFunction;
-  readonly properties: RuleProperty;
-  readonly occludes: boolean = false;
-
   constructor(
-    open: number,
-    close: number,
-    properties: RuleProperty,
-    display: DisplayFunction,
-    openKind = TokenKind.Default,
-    closesKind = TokenKind.Default,
-    occludes = false
-  ) {
-    this.properties = properties;
-    this.display = display;
-    this.open = open;
-    this.close = close;
-    this.openKind = openKind;
-    this.closesKind = closesKind;
-    this.occludes = occludes;
-  }
+    readonly open: number,
+    readonly close: number,
+    readonly properties: RuleProperty,
+    readonly display: DisplayFunction,
+    readonly openKind = TokenKind.Default,
+    readonly closesKind = TokenKind.Default,
+    readonly occludes = false,
+    readonly multiline = true
+  ) {}
 }
 
 export default Rule;
