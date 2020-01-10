@@ -1,3 +1,4 @@
+// @ts-ignore
 import Surku = require("surku");
 import test from "ava";
 import SlackLike, { Type } from "../../../markups/SlackLike";
