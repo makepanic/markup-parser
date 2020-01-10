@@ -66,7 +66,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   )
   .add(
     new TokenMatcher(
-      /\b\S+\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)(\/[a-z0-9-+&@#\/%=~_|]*)*\b/gi,
+      /\b\S+[^.]\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)(\/[a-z0-9-+&@#\/%=~_|]*)*\b/gi,
       Type.PseudoUrl
     )
   )
