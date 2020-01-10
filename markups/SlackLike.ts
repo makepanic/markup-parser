@@ -10,7 +10,7 @@ import TokenKind from "../lib/token/TokenKind";
 import {
   and,
   closes,
-  spaceOrNewlineBefore,
+  spaceOrNewlineBeforeWith,
   not,
   opens,
   or,
@@ -20,7 +20,7 @@ import {
   startOfString,
   whitespaceAfter,
   whitespaceBeforeOrAfter,
-  newlineBefore
+  newlineBeforeWith
 } from "../lib/utils/Conditions";
 import IMarkup from "./IMarkup";
 import Token from "../lib/token/Token";
@@ -29,7 +29,6 @@ export const Type = {
   Nul: 0,
   Newline: 1,
   Quote: 2,
-  Escape: 3,
   Url: 4,
   PseudoUrl: 5,
   Email: 6,
@@ -43,6 +42,9 @@ export const Type = {
   User: 14
 };
 
+const newlineBefore = newlineBeforeWith(Type.Newline);
+const spaceOrNewlineBefore = spaceOrNewlineBeforeWith(Type.Newline);
+
 const tokenizer = new Tokenizer(Type.Text, Type.Nul)
   .add(new TokenMatcher(/(\n)/g, Type.Newline))
   .add(
@@ -53,7 +55,6 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
       ]
     ])
   )
-  .add(new TokenMatcher(/(\\)/g, Type.Escape))
   .add(
     new TokenMatcher(
       /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi,
@@ -128,9 +129,8 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
     ])
   );
 
-const grammar = new Grammar()
+const grammar = new Grammar(Type.Newline)
   .add(new ConstantRule(Type.Newline, "<br>"))
-  .add(new ConstantRule(Type.Escape, ""))
   .add(
     new TextRule(
       Type.Url,
@@ -165,7 +165,9 @@ const grammar = new Grammar()
       Type.Highlight,
       children => `<em>${children}</em>`,
       TokenKind.Opens,
-      TokenKind.Closes
+      TokenKind.Closes,
+      false,
+      false
     )
   )
   .add(
@@ -177,7 +179,9 @@ const grammar = new Grammar()
           ? `<span data-user="${meta.user}">${children}</span>`
           : children,
       TokenKind.Opens,
-      TokenKind.Closes
+      TokenKind.Closes,
+      false,
+      false
     )
   )
   .add(
@@ -193,7 +197,9 @@ const grammar = new Grammar()
       Type.Bold,
       children => `<strong>${children}</strong>`,
       TokenKind.Opens,
-      TokenKind.Closes
+      TokenKind.Closes,
+      false,
+      false
     )
   )
   .add(
@@ -202,7 +208,9 @@ const grammar = new Grammar()
       Type.Italics,
       children => `<i>${children}</i>`,
       TokenKind.Opens,
-      TokenKind.Closes
+      TokenKind.Closes,
+      false,
+      false
     )
   )
   .add(
@@ -213,7 +221,9 @@ const grammar = new Grammar()
         return `<strike>${children}</strike>`;
       },
       TokenKind.Opens,
-      TokenKind.Closes
+      TokenKind.Closes,
+      false,
+      false
     )
   )
   .add(
@@ -237,7 +247,8 @@ const grammar = new Grammar()
       },
       TokenKind.Opens,
       TokenKind.Closes,
-      true
+      true,
+      false
     )
   );
 

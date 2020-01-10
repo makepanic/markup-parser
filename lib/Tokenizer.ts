@@ -25,17 +25,9 @@ function hasHole(array: boolean[], from: number, until: number) {
  * @class
  */
 class Tokenizer<T extends number> {
-  private matcher: TokenMatcher[];
-  private filler: T;
-  private escaper: string = "\\";
-  private terminator: T;
+  private matcher: TokenMatcher[] = [];
 
-  constructor(filler: T, terminator: T, escaper: string = "\\") {
-    this.matcher = [];
-    this.filler = filler;
-    this.terminator = terminator;
-    this.escaper = escaper;
-  }
+  constructor(private filler: T, private terminator: T) {}
 
   add(tokenMatcher: TokenMatcher) {
     this.matcher.push(tokenMatcher);
@@ -60,11 +52,9 @@ class Tokenizer<T extends number> {
         const start = match.index;
         const end = start + match[0].length;
 
-        if (string[start - 1] !== this.escaper) {
-          if (hasHole(matchedRangesBuffer, start, end)) {
-            fillArray(matchedRangesBuffer, start, end);
-            ranges.push([start, end, matcher]);
-          }
+        if (hasHole(matchedRangesBuffer, start, end)) {
+          fillArray(matchedRangesBuffer, start, end);
+          ranges.push([start, end, matcher]);
         }
       }
     });

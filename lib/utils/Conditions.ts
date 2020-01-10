@@ -29,7 +29,7 @@ export const whitespaceBeforeOrAfter: Constraint = or(
 export const opens = or(whitespaceBefore, startOfString);
 export const closes = or(whitespaceAfter, endOfString);
 
-export const spaceOrNewlineBefore: Constraint = (
+export const spaceOrNewlineBeforeWith = (newlineId: number): Constraint => (
   string,
   _start,
   _end,
@@ -44,7 +44,7 @@ export const spaceOrNewlineBefore: Constraint = (
     const [, pTEnd, matcher] = tokens[index - 1];
 
     // previous token is newline
-    if (matcher.id === 1) {
+    if (matcher.id === newlineId) {
       // either newline end = current start
       return (
         pTEnd === tStart ||
@@ -61,7 +61,7 @@ export const spaceOrNewlineBefore: Constraint = (
   return SPACE_OR_NEWLINE_BEFORE.test(stringBefore);
 };
 
-export const newlineBefore: Constraint = (
+export const newlineBeforeWith = (newlineId: number): Constraint => (
   string,
   _start,
   _end,
@@ -75,7 +75,7 @@ export const newlineBefore: Constraint = (
     const [, pTEnd, matcher] = tokens[index - 1];
 
     // previous token is newline
-    if (matcher.id === 1) {
+    if (matcher.id === newlineId) {
       // either newline end = current start
       return (
         pTEnd === tStart ||

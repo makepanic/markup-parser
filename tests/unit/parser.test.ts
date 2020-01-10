@@ -14,14 +14,15 @@ const Type = {
   Block: 2,
   A: 3,
   B: 4,
-  C: 5
+  C: 5,
+  Newline: 6,
 };
 
 const tokenizer = new Tokenizer(Type.Text, Type.Nul).add(
   new TokenMatcher(/B/g, Type.Block)
 );
 
-const grammar = new Grammar()
+const grammar = new Grammar(Type.Newline)
   .add(new TextRule(Type.Text, t => `${t}`))
   .add(new BlockRule(Type.Block, Type.Block, children => `[B]${children}[/B]`));
 

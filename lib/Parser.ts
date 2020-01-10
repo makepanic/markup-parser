@@ -11,13 +11,7 @@ export interface PeekResult {
 }
 
 class Parser {
-  private grammar: Grammar;
-  private fallbackRule: Rule;
-
-  constructor(grammar: Grammar, fallbackRule: Rule) {
-    this.grammar = grammar;
-    this.fallbackRule = fallbackRule;
-  }
+  constructor(private grammar: Grammar, private fallbackRule: Rule) {}
 
   /**
    * Find a token that matches type and kind in a given list of tokens
@@ -31,13 +25,21 @@ class Parser {
     tokenKind: TokenKind,
     tokens: Token[],
     from: number,
-    until: number
+    until: number,
+    multiline: boolean = true
   ): PeekResult | undefined {
     let idx = -1;
     let token;
+    const { newline } = this.grammar;
 
     for (let i = from; i < until; i++) {
       const { id, kind } = tokens[i];
+
+      if (type !== id && !multiline && id === newline) {
+        // if we don't support multiline, stop at newline
+        return undefined;
+      }
+
       if (type === id && (kind === tokenKind || kind & tokenKind)) {
         idx = i - from;
         token = tokens[i];
@@ -102,7 +104,8 @@ class Parser {
             rule.closesKind,
             tokens,
             index + 1,
-            until
+            until,
+            rule.multiline
           );
 
           if (closing === undefined) {

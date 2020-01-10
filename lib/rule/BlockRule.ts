@@ -12,7 +12,8 @@ class BlockRule extends Rule {
     display: DisplayFunction,
     kindOpen = TokenKind.Default,
     kindClosed = TokenKind.Default,
-    occludes = false
+    occludes = false,
+    multiline = true
   ) {
     super(
       open,
@@ -21,7 +22,8 @@ class BlockRule extends Rule {
       display,
       kindOpen,
       kindClosed,
-      occludes
+      occludes,
+      multiline
     );
   }
 }
