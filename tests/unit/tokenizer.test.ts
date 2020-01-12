@@ -7,36 +7,36 @@ const Type = {
   EOL: 0,
   Text: 1,
   Newline: 2,
-  A: 3
+  A: 3,
+  Escape: 4
 };
 
 test("tokenize", function(t) {
-  const tokenizer = new Tokenizer(Type.Text, Type.EOL)
+  const tokenizer = new Tokenizer(Type.Text, Type.EOL, Type.Escape)
     .add(new TokenMatcher(/(\n)/g, Type.Newline))
     .add(new TokenMatcher(/A/g, Type.A));
 
   const tokens = tokenizer.tokenize("hello A world\naa");
-  t.deepEqual(tokens.map(token => token.id), [
-    Type.Text,
-    Type.A,
-    Type.Text,
-    Type.Newline,
-    Type.Text,
-    Type.EOL
-  ]);
+  t.deepEqual(
+    tokens.map(token => token.id),
+    [Type.Text, Type.A, Type.Text, Type.Newline, Type.Text, Type.EOL]
+  );
 });
 
 test("tokenize empty string", function(t) {
-  const tokenizer = new Tokenizer(Type.Text, Type.EOL)
+  const tokenizer = new Tokenizer(Type.Text, Type.EOL, Type.Escape)
     .add(new TokenMatcher(/(\n)/g, Type.Newline))
     .add(new TokenMatcher(/A/g, Type.A));
 
   const tokens = tokenizer.tokenize("");
-  t.deepEqual(tokens.map(token => token.id), [Type.EOL]);
+  t.deepEqual(
+    tokens.map(token => token.id),
+    [Type.EOL]
+  );
 });
 
 test("uses constraint function", function(t) {
-  const tokenizerA = new Tokenizer(Type.Text, Type.EOL).add(
+  const tokenizerA = new Tokenizer(Type.Text, Type.EOL, Type.Escape).add(
     new TokenMatcher(/A/g, Type.A, [
       [
         (string, start) => string.substring(start, start + 1) === "A",
@@ -45,7 +45,7 @@ test("uses constraint function", function(t) {
     ])
   );
 
-  const tokenizerB = new Tokenizer(Type.Text, Type.EOL).add(
+  const tokenizerB = new Tokenizer(Type.Text, Type.EOL, Type.Escape).add(
     new TokenMatcher(/A/g, Type.A, [
       [
         (string, start) => string.substring(start, start + 1) === "B",
@@ -54,12 +54,12 @@ test("uses constraint function", function(t) {
     ])
   );
 
-  t.deepEqual(tokenizerA.tokenize("A").map(token => token.id), [
-    Type.A,
-    Type.EOL
-  ]);
-  t.deepEqual(tokenizerB.tokenize("A").map(token => token.id), [
-    Type.Text,
-    Type.EOL
-  ]);
+  t.deepEqual(
+    tokenizerA.tokenize("A").map(token => token.id),
+    [Type.A, Type.EOL]
+  );
+  t.deepEqual(
+    tokenizerB.tokenize("A").map(token => token.id),
+    [Type.Text, Type.EOL]
+  );
 });

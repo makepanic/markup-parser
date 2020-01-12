@@ -16,9 +16,10 @@ const Type = {
   B: 4,
   C: 5,
   Newline: 6,
+  Escape: 7
 };
 
-const tokenizer = new Tokenizer(Type.Text, Type.Nul).add(
+const tokenizer = new Tokenizer(Type.Text, Type.Nul, Type.Escape).add(
   new TokenMatcher(/B/g, Type.Block)
 );
 

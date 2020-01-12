@@ -27,7 +27,7 @@ function hasHole(array: boolean[], from: number, until: number) {
 class Tokenizer<T extends number> {
   private matcher: TokenMatcher[] = [];
 
-  constructor(private filler: T, private terminator: T) {}
+  constructor(private filler: T, private terminator: T, private escaper: T) {}
 
   add(tokenMatcher: TokenMatcher) {
     this.matcher.push(tokenMatcher);
@@ -89,8 +89,13 @@ class Tokenizer<T extends number> {
           TokenKind.Default
         );
 
-        // [n, m, Bold, Closes]
-        let token = new Token(start, end, matcher.id, mergedKinds, meta);
+        let token: Token;
+        // if previous token is escaper, handle this one as filler
+        if (tokens[tokens.length - 1]?.id === this.escaper) {
+          token = new Token(start, end, this.filler);
+        } else {
+          token = new Token(start, end, matcher.id, mergedKinds, meta);
+        }
 
         // only add filler if there's something to fill
         if (lastEnd < start) {

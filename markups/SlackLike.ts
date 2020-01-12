@@ -29,6 +29,7 @@ export const Type = {
   Nul: 0,
   Newline: 1,
   Quote: 2,
+  Escape: 3,
   Url: 4,
   PseudoUrl: 5,
   Email: 6,
@@ -45,7 +46,8 @@ export const Type = {
 const newlineBefore = newlineBeforeWith(Type.Newline);
 const spaceOrNewlineBefore = spaceOrNewlineBeforeWith(Type.Newline);
 
-const tokenizer = new Tokenizer(Type.Text, Type.Nul)
+const tokenizer = new Tokenizer(Type.Text, Type.Nul, Type.Escape)
+  .add(new TokenMatcher(/(\\)/g, Type.Escape))
   .add(new TokenMatcher(/(\n)/g, Type.Newline))
   .add(
     new TokenMatcher(/(>)/g, Type.Quote, [
@@ -131,6 +133,7 @@ const tokenizer = new Tokenizer(Type.Text, Type.Nul)
 
 const grammar = new Grammar(Type.Newline)
   .add(new ConstantRule(Type.Newline, "<br>"))
+  .add(new ConstantRule(Type.Escape, ""))
   .add(
     new TextRule(
       Type.Url,
