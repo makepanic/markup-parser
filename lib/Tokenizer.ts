@@ -89,17 +89,18 @@ class Tokenizer<T extends number> {
           TokenKind.Default
         );
 
+        // only add filler if there's something to fill
+        if (lastEnd < start) {
+          tokens.push(new Token(lastEnd, start, this.filler));
+        }
+
         let token: Token;
+
         // if previous token is escaper, handle this one as filler
         if (tokens[tokens.length - 1]?.id === this.escaper) {
           token = new Token(start, end, this.filler);
         } else {
           token = new Token(start, end, matcher.id, mergedKinds, meta);
-        }
-
-        // only add filler if there's something to fill
-        if (lastEnd < start) {
-          tokens.push(new Token(lastEnd, start, this.filler));
         }
 
         tokens.push(token);

@@ -185,7 +185,8 @@ Mauris ipsum felis, gravida eget sodales viverra, sodales congue erat. Duis nec 
   ],
   ["```code``` > quote", "<pre>code</pre> > quote"],
   ["foo bar..com baz", "foo bar..com baz"],
-  ["*hey \ncool*", "*hey <br>cool*"]
+  ["*hey \ncool*", "*hey <br>cool*"],
+  ["* `/)\\b/gi`\n", "* <code>/)\\b/gi</code><br>"]
 ];
 
 const markup = new SlackLike();
