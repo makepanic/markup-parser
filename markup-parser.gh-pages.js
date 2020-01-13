@@ -45,18 +45,19 @@ define("lib/rule/Rule", ["require", "exports", "lib/token/TokenKind"], function 
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Rule = /** @class */ (function () {
-        function Rule(open, close, properties, display, openKind, closesKind, occludes) {
+        function Rule(open, close, properties, display, openKind, closesKind, occludes, multiline) {
             if (openKind === void 0) { openKind = TokenKind_1.default.Default; }
             if (closesKind === void 0) { closesKind = TokenKind_1.default.Default; }
             if (occludes === void 0) { occludes = false; }
-            this.occludes = false;
-            this.properties = properties;
-            this.display = display;
+            if (multiline === void 0) { multiline = true; }
             this.open = open;
             this.close = close;
+            this.properties = properties;
+            this.display = display;
             this.openKind = openKind;
             this.closesKind = closesKind;
             this.occludes = occludes;
+            this.multiline = multiline;
         }
         return Rule;
     }());
@@ -66,7 +67,8 @@ define("lib/Grammar", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Grammar = /** @class */ (function () {
-        function Grammar() {
+        function Grammar(newline) {
+            this.newline = newline;
             this.rules = [];
             this.ruleOpenLookup = {};
         }
@@ -144,12 +146,12 @@ define("lib/token/Token", ["require", "exports", "lib/token/TokenKind"], functio
     var Token = /** @class */ (function () {
         function Token(start, end, id, kind, meta) {
             if (kind === void 0) { kind = TokenKind_2.default.Default; }
-            this.consumed = false;
             this.start = start;
             this.end = end;
             this.id = id;
             this.kind = kind;
             this.meta = meta;
+            this.consumed = false;
         }
         return Token;
     }());
@@ -170,11 +172,17 @@ define("lib/Parser", ["require", "exports", "lib/rule/RuleProperty", "lib/Node"]
          * @param {Array<Token<T extends number>>} tokens
          * @return {PeekResult<T extends number>}
          */
-        Parser.prototype.peek = function (type, tokenKind, tokens, from, until) {
+        Parser.prototype.peek = function (type, tokenKind, tokens, from, until, multiline) {
+            if (multiline === void 0) { multiline = true; }
             var idx = -1;
             var token;
+            var newline = this.grammar.newline;
             for (var i = from; i < until; i++) {
                 var _a = tokens[i], id = _a.id, kind = _a.kind;
+                if (type !== id && !multiline && id === newline) {
+                    // if we don't support multiline, stop at newline
+                    return undefined;
+                }
                 if (type === id && (kind === tokenKind || kind & tokenKind)) {
                     idx = i - from;
                     token = tokens[i];
@@ -222,7 +230,7 @@ define("lib/Parser", ["require", "exports", "lib/rule/RuleProperty", "lib/Node"]
                     }
                     if (rule.properties === RuleProperty_1.default.Block) {
                         // block rule
-                        var closing = this.peek(rule.close, rule.closesKind, tokens, index + 1, until);
+                        var closing = this.peek(rule.close, rule.closesKind, tokens, index + 1, until, rule.multiline);
                         if (closing === undefined) {
                             if (ruleIndex - 1 === rules.length) {
                                 // TODO: check if this can be reached with terminator
@@ -315,12 +323,10 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
      */
     var Tokenizer = /** @class */ (function () {
         function Tokenizer(filler, terminator, escaper) {
-            if (escaper === void 0) { escaper = "\\"; }
-            this.escaper = "\\";
-            this.matcher = [];
             this.filler = filler;
             this.terminator = terminator;
             this.escaper = escaper;
+            this.matcher = [];
         }
         Tokenizer.prototype.add = function (tokenMatcher) {
             this.matcher.push(tokenMatcher);
@@ -333,7 +339,6 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
          * @return {MatchRange[]} list of all matched match ranges
          */
         Tokenizer.prototype.findMatchRanges = function (string, ranges) {
-            var _this = this;
             if (ranges === void 0) { ranges = []; }
             var matchedRangesBuffer = [];
             //create list of tokens
@@ -343,11 +348,9 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
                 while ((match = matcher.regex.exec(string)) !== null) {
                     var start = match.index;
                     var end = start + match[0].length;
-                    if (string[start - 1] !== _this.escaper) {
-                        if (hasHole(matchedRangesBuffer, start, end)) {
-                            fillArray(matchedRangesBuffer, start, end);
-                            ranges.push([start, end, matcher]);
-                        }
+                    if (hasHole(matchedRangesBuffer, start, end)) {
+                        fillArray(matchedRangesBuffer, start, end);
+                        ranges.push([start, end, matcher]);
                     }
                 }
             });
@@ -372,6 +375,7 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
             })
                 .forEach(function (_a, index, ranges) {
                 var start = _a[0], end = _a[1], matcher = _a[2], meta = _a[3];
+                var _b;
                 // find matching constraint
                 var matchingConstraints = matcher.constraints.filter(function (_a) {
                     var constraint = _a[0];
@@ -383,11 +387,17 @@ define("lib/Tokenizer", ["require", "exports", "lib/token/Token", "lib/token/Tok
                     var kind = _a[1];
                     return all | kind;
                 }, TokenKind_4.default.Default);
-                // [n, m, Bold, Closes]
-                var token = new Token_1.default(start, end, matcher.id, mergedKinds, meta);
                 // only add filler if there's something to fill
                 if (lastEnd < start) {
                     tokens.push(new Token_1.default(lastEnd, start, _this.filler));
+                }
+                var token;
+                // if previous token is escaper, handle this one as filler
+                if (((_b = tokens[tokens.length - 1]) === null || _b === void 0 ? void 0 : _b.id) === _this.escaper) {
+                    token = new Token_1.default(start, end, _this.filler);
+                }
+                else {
+                    token = new Token_1.default(start, end, matcher.id, mergedKinds, meta);
                 }
                 tokens.push(token);
                 lastEnd = end;
@@ -420,11 +430,12 @@ define("lib/rule/BlockRule", ["require", "exports", "lib/rule/RuleProperty", "li
      */
     var BlockRule = /** @class */ (function (_super) {
         __extends(BlockRule, _super);
-        function BlockRule(open, close, display, kindOpen, kindClosed, occludes) {
+        function BlockRule(open, close, display, kindOpen, kindClosed, occludes, multiline) {
             if (kindOpen === void 0) { kindOpen = TokenKind_5.default.Default; }
             if (kindClosed === void 0) { kindClosed = TokenKind_5.default.Default; }
             if (occludes === void 0) { occludes = false; }
-            return _super.call(this, open, close, RuleProperty_2.default.Block, display, kindOpen, kindClosed, occludes) || this;
+            if (multiline === void 0) { multiline = true; }
+            return _super.call(this, open, close, RuleProperty_2.default.Block, display, kindOpen, kindClosed, occludes, multiline) || this;
         }
         return BlockRule;
     }(Rule_1.default));
@@ -509,14 +520,14 @@ define("lib/utils/Conditions", ["require", "exports", "lib/token/TokenKind"], fu
     exports.whitespaceBeforeOrAfter = exports.or(exports.whitespaceBefore, exports.whitespaceAfter, exports.startOfString, exports.endOfString);
     exports.opens = exports.or(exports.whitespaceBefore, exports.startOfString);
     exports.closes = exports.or(exports.whitespaceAfter, exports.endOfString);
-    exports.newlineBefore = function (string, _start, _end, index, tokens) {
+    exports.spaceOrNewlineBeforeWith = function (newlineId) { return function (string, _start, _end, index, tokens) {
         var tStart = tokens[index][0];
         var stringBefore;
         if (index - 1 >= 0) {
             // has previous token
             var _a = tokens[index - 1], pTEnd = _a[1], matcher = _a[2];
             // previous token is newline
-            if (matcher.id === 1) {
+            if (matcher.id === newlineId) {
                 // either newline end = current start
                 return (pTEnd === tStart ||
                     // or string between newline end and current start is whitespace
@@ -528,7 +539,22 @@ define("lib/utils/Conditions", ["require", "exports", "lib/token/TokenKind"], fu
             stringBefore = string.substring(0, tStart);
         }
         return SPACE_OR_NEWLINE_BEFORE.test(stringBefore);
-    };
+    }; };
+    exports.newlineBeforeWith = function (newlineId) { return function (string, _start, _end, index, tokens) {
+        var tStart = tokens[index][0];
+        if (index - 1 >= 0) {
+            // has previous token
+            var _a = tokens[index - 1], pTEnd = _a[1], matcher = _a[2];
+            // previous token is newline
+            if (matcher.id === newlineId) {
+                // either newline end = current start
+                return (pTEnd === tStart ||
+                    // or string between newline end and current start is whitespace
+                    SPACE_OR_NEWLINE_BEFORE.test(string.substring(pTEnd, tStart)));
+            }
+        }
+        return false;
+    }; };
     exports.otherTokenBefore = function (_string, start, _end, index, tokens) {
         if (index - 1 >= 0) {
             var _a = tokens[index - 1], tEnd = _a[1], prevMatcher = _a[2];
@@ -702,37 +728,39 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         Highlight: 13,
         User: 14
     };
-    var tokenizer = new Tokenizer_2.default(exports.Type.Text, exports.Type.Nul)
+    var newlineBefore = Conditions_1.newlineBeforeWith(exports.Type.Newline);
+    var spaceOrNewlineBefore = Conditions_1.spaceOrNewlineBeforeWith(exports.Type.Newline);
+    var tokenizer = new Tokenizer_2.default(exports.Type.Text, exports.Type.Nul, exports.Type.Escape)
+        .add(new TokenMatcher_2.default(/(\\)/g, exports.Type.Escape))
         .add(new TokenMatcher_2.default(/(\n)/g, exports.Type.Newline))
         .add(new TokenMatcher_2.default(/(>)/g, exports.Type.Quote, [
         [
-            Conditions_1.and(Conditions_1.or(Conditions_1.startOfString, Conditions_1.newlineBefore), Conditions_1.whitespaceAfter),
+            Conditions_1.and(Conditions_1.or(Conditions_1.startOfString, newlineBefore), Conditions_1.whitespaceAfter),
             TokenKind_9.default.Default
         ]
     ]))
-        .add(new TokenMatcher_2.default(/(\\)/g, exports.Type.Escape))
         .add(new TokenMatcher_2.default(/\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gi, exports.Type.Url))
         .add(new TokenMatcher_2.default(/\bwww\.\S+\b/gi, exports.Type.PseudoUrl))
         .add(new TokenMatcher_2.default(/\b(([\w+\-.]+)@\w+?(?:\.[a-zA-Z]{2,6}))+\b/gi, exports.Type.Email))
-        .add(new TokenMatcher_2.default(/\b\S+\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)(\/[a-z0-9-+&@#\/%=~_|]*)*\b/gi, exports.Type.PseudoUrl))
+        .add(new TokenMatcher_2.default(/\b\S+[^.]\.(com|org|de|fr|fi|uk|es|it|nl|br|net|cz|no|pl|ca|se|ru|eu|gov|jp|shop|at|ch|online|biz|io|berlin|info)(\/[a-z0-9-+&@#\/%=~_|]*)*\b/gi, exports.Type.PseudoUrl))
         .add(new TokenMatcher_2.default(/(\*)/g, exports.Type.Bold, [
         [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
         [
-            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(spaceOrNewlineBefore)),
             TokenKind_9.default.Closes
         ]
     ]))
         .add(new TokenMatcher_2.default(/(_)/g, exports.Type.Italics, [
         [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
         [
-            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(spaceOrNewlineBefore)),
             TokenKind_9.default.Closes
         ]
     ]))
         .add(new TokenMatcher_2.default(/(~)/g, exports.Type.Strike, [
         [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
         [
-            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(spaceOrNewlineBefore)),
             TokenKind_9.default.Closes
         ]
     ]))
@@ -742,11 +770,11 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         .add(new TokenMatcher_2.default(/(`)/g, exports.Type.Code, [
         [Conditions_1.or(Conditions_1.opens, Conditions_1.otherTokenBefore), TokenKind_9.default.Opens],
         [
-            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(Conditions_1.newlineBefore)),
+            Conditions_1.and(Conditions_1.or(Conditions_1.closes, Conditions_1.otherTokenAfter), Conditions_1.not(Conditions_1.sameOpeningBefore), Conditions_1.not(spaceOrNewlineBefore)),
             TokenKind_9.default.Closes
         ]
     ]));
-    var grammar = new Grammar_2.default()
+    var grammar = new Grammar_2.default(exports.Type.Newline)
         .add(new ConstantRule_2.default(exports.Type.Newline, "<br>"))
         .add(new ConstantRule_2.default(exports.Type.Escape, ""))
         .add(new TextRule_2.default(exports.Type.Url, function (text) {
@@ -759,24 +787,24 @@ define("markups/SlackLike", ["require", "exports", "lib/Tokenizer", "lib/token/T
         return "<a href=\"mailto:" + text + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + text + "</a>";
     }))
         .add(new BlockRule_2.default(exports.Type.Quote, exports.Type.Newline, function (children) { return "<blockquote>" + children + "</blockquote>"; }))
-        .add(new BlockRule_2.default(exports.Type.Highlight, exports.Type.Highlight, function (children) { return "<em>" + children + "</em>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
+        .add(new BlockRule_2.default(exports.Type.Highlight, exports.Type.Highlight, function (children) { return "<em>" + children + "</em>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, false, false))
         .add(new BlockRule_2.default(exports.Type.User, exports.Type.User, function (children, _occluded, meta) {
         return meta && meta.user
             ? "<span data-user=\"" + meta.user + "\">" + children + "</span>"
             : children;
-    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, false, false))
         .add(new BlockRule_2.default(exports.Type.Quote, exports.Type.Nul, function (children) { return "<blockquote>" + children + "</blockquote>"; }))
-        .add(new BlockRule_2.default(exports.Type.Bold, exports.Type.Bold, function (children) { return "<strong>" + children + "</strong>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
-        .add(new BlockRule_2.default(exports.Type.Italics, exports.Type.Italics, function (children) { return "<i>" + children + "</i>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
+        .add(new BlockRule_2.default(exports.Type.Bold, exports.Type.Bold, function (children) { return "<strong>" + children + "</strong>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, false, false))
+        .add(new BlockRule_2.default(exports.Type.Italics, exports.Type.Italics, function (children) { return "<i>" + children + "</i>"; }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, false, false))
         .add(new BlockRule_2.default(exports.Type.Strike, exports.Type.Strike, function (children) {
         return "<strike>" + children + "</strike>";
-    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes))
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, false, false))
         .add(new BlockRule_2.default(exports.Type.Preformatted, exports.Type.Preformatted, function (children) {
         return "<pre>" + children + "</pre>";
     }, TokenKind_9.default.Default, TokenKind_9.default.Default, true))
         .add(new BlockRule_2.default(exports.Type.Code, exports.Type.Code, function (children) {
         return "<code>" + children + "</code>";
-    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, true));
+    }, TokenKind_9.default.Opens, TokenKind_9.default.Closes, true, false));
     var parser = new Parser_2.default(grammar, new TextRule_2.default(exports.Type.Text, function (text) { return text; }));
     var SlackLike = /** @class */ (function () {
         function SlackLike() {
